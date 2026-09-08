@@ -268,6 +268,7 @@ elif menu_choice == "📷 Live Vision Feed":
 elif menu_choice == "👤 Face Registration & Training":
     st.title("👤 Face Registration & Training")
     st.markdown("Train the 128-dimensional SFace metric learning model on your face with automated multi-shot data augmentation.")
+    st.info("ℹ️ **Human Biometrics Note:** This module registers and trains **human face identities** into the SFace 128-D embedding database. If you want to detect **cats, dogs, animals, or general objects**, visit the **🔍 Static Image Inspector** or **📷 Live Vision Feed**!")
     st.markdown("---")
 
     recognizer = engine.face_recognizer
@@ -329,72 +330,98 @@ elif menu_choice == "🔍 Static Image Inspector":
     st.markdown("Upload any photo to inspect Face Recognition and YOLOv8 detections with interactive threshold sliders.")
     st.markdown("---")
 
-    ctrl_col1, ctrl_col2, ctrl_col3 = st.columns(3)
+    ctrl_col1, ctrl_col2 = st.columns(2)
     with ctrl_col1:
-        sim_thresh = st.slider("Face Recognition Threshold", 0.1, 0.9, float(FACE_SIMILARITY_THRESHOLD), 0.02)
+        sim_thresh = st.slider("Face Recognition Threshold", 0.1, 0.9, float(FACE_SIMILARITY_THRESHOLD), 0.02,
+                               help="Cosine similarity cutoff for matching a human face against enrolled identities.")
     with ctrl_col2:
-        yolo_conf = st.slider("YOLO Object Confidence", 0.1, 0.9, float(YOLO_CONFIDENCE_THRESHOLD), 0.05)
-    # Dynamically find all test images in data/test_images/ and enrolled dataset faces
-    test_img_files = [f.name for f in sorted(TEST_IMAGES_DIR.glob("*.jpg"))]
-    available_samples = ["Upload My Own"] + test_img_files
-    for person_dir in sorted(FACES_DIR.iterdir()):
-        if person_dir.is_dir() and person_dir.name != "Lena":
-            sample_file = next(person_dir.glob("*.jpg"), None)
-            if sample_file:
-                available_samples.append(f"Enrolled Face: {person_dir.name}")
+        yolo_conf = st.slider("YOLO Object & Animal Confidence", 0.05, 0.95, float(YOLO_CONFIDENCE_THRESHOLD), 0.05,
+                              help="Minimum confidence for detecting animals (cat, dog, bird, etc.) and COCO objects.")
 
-    with ctrl_col3:
-        sample_choice = st.selectbox("Or choose a sample test image:", available_samples)
+    input_source = st.radio(
+        "Select Image Input Mode:",
+        ["📁 Upload Image from Device (Cat, Dog, Animals, People, Objects)", "🖼️ Select Benchmark Sample from Gallery"],
+        horizontal=True,
+    )
 
     image_to_process = None
+    image_name = "Uploaded Image"
 
-    if sample_choice == "Upload My Own":
-        uploaded = st.file_uploader("Upload an Image", type=["jpg", "jpeg", "png"])
-        if uploaded:
+    if "Upload Image" in input_source:
+        uploaded = st.file_uploader(
+            "Upload any image (JPG, JPEG, PNG, WEBP, BMP):",
+            type=["jpg", "jpeg", "png", "webp", "bmp", "jfif"],
+            help="Upload any picture of a cat, dog, animal, person, or household item.",
+        )
+        if uploaded is not None:
             bytes_data = uploaded.read()
             image_to_process = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
-    elif sample_choice.startswith("Enrolled Face: "):
-        # Extract folder name
-        p_name = sample_choice.split("Enrolled Face: ")[1].strip()
-        sample_path = FACES_DIR / p_name / "pose_01.jpg"
-        if sample_path.exists():
-            image_to_process = cv2.imread(str(sample_path))
+            image_name = uploaded.name
     else:
-        sample_path = TEST_IMAGES_DIR / sample_choice
-        if sample_path.exists():
-            image_to_process = cv2.imread(str(sample_path))
+        test_img_files = [f.name for f in sorted(TEST_IMAGES_DIR.glob("*.jpg"))]
+        available_samples = test_img_files.copy()
+        for person_dir in sorted(FACES_DIR.iterdir()):
+            if person_dir.is_dir() and person_dir.name != "Lena":
+                sample_file = next(person_dir.glob("*.jpg"), None)
+                if sample_file:
+                    available_samples.append(f"Enrolled Face: {person_dir.name}")
+
+        selected_sample = st.selectbox("Choose pre-loaded test image:", available_samples)
+        if selected_sample:
+            if selected_sample.startswith("Enrolled Face: "):
+                p_name = selected_sample.split("Enrolled Face: ")[1].strip()
+                sample_path = FACES_DIR / p_name / "pose_01.jpg"
+            else:
+                sample_path = TEST_IMAGES_DIR / selected_sample
+            if sample_path.exists():
+                image_to_process = cv2.imread(str(sample_path))
+                image_name = selected_sample
 
     if image_to_process is not None:
-        if engine.face_recognizer:
-            engine.face_recognizer.similarity_threshold = sim_thresh
-        if engine.object_detector:
-            engine.object_detector.confidence_threshold = yolo_conf
+        # Reset temporal tracks for static image analysis
+        engine.tracks.clear()
+
+        # Update sensitivity thresholds
+        engine.set_similarity_threshold(sim_thresh)
+        engine.set_yolo_confidence(yolo_conf)
 
         res = engine.process_frame(image_to_process)
         annotated = engine.draw_results(image_to_process, res)
 
+        # Telemetry metrics
+        stat_c1, stat_c2, stat_c3, stat_c4 = st.columns(4)
+        stat_c1.metric("Image Resolution", f"{image_to_process.shape[1]}x{image_to_process.shape[0]}")
+        stat_c2.metric("Animals & Objects", f"{len(res.objects)}")
+        stat_c3.metric("Human Faces", f"{len(res.faces)}")
+        stat_c4.metric("Total Identified", f"{len(res.fused_entities)}")
+
         v_col1, v_col2 = st.columns(2)
         with v_col1:
-            st.markdown("##### Original Image")
+            st.markdown(f"##### Original Image: `{image_name}`")
             st.image(cv2.cvtColor(image_to_process, cv2.COLOR_BGR2RGB), use_container_width=True)
         with v_col2:
-            st.markdown("##### Annotated Detections")
+            st.markdown("##### Annotated Detections (All 80 COCO Classes & Faces)")
             st.image(cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB), use_container_width=True)
 
         st.markdown("#### Detected Entities Breakdown")
         if res.fused_entities:
             table_data = []
             for e in res.fused_entities:
+                is_animal = e["label"].lower() in [
+                    "cat", "dog", "bird", "horse", "sheep", "cow",
+                    "elephant", "bear", "zebra", "giraffe", "teddy bear"
+                ]
+                entity_kind = "🐾 Animal" if is_animal else ("👤 Person (Face)" if e.get("is_recognized_face") else f"📦 {e['type'].capitalize()}")
                 table_data.append({
-                    "Entity Type": e["type"].capitalize(),
-                    "Label / Identity": e["label"],
+                    "Category": entity_kind,
+                    "Detected Label / Identity": e["label"],
                     "Confidence / Similarity": f"{e['confidence']*100:.1f}%",
                     "Bounding Box (x, y, w, h)": str(e["box"]),
                     "Recognized Face": "Yes" if e.get("is_recognized_face") else "No",
                 })
             st.dataframe(pd.DataFrame(table_data), use_container_width=True)
         else:
-            st.info("No entities detected under current confidence thresholds.")
+            st.warning(f"No entities detected under current thresholds (YOLO: {yolo_conf*100:.0f}%). Try lowering the 'YOLO Object & Animal Confidence' slider above!")
 
 
 # ---------------------------------------------------------

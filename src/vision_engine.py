@@ -26,7 +26,7 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from config import DEFAULT_CAMERA_INDEX, FACE_SIMILARITY_THRESHOLD
 from src.face_recognition import FaceRecognizer
-from src.object_detection import ObjectDetector
+from src.object_detection import ObjectDetector, CLASS_COLOR_PALETTE
 from src.utils import draw_styled_box, is_box_inside, compute_iou
 
 
@@ -227,6 +227,10 @@ class CombinedVisionEngine:
                             "color": (255, 100, 50),
                         })
                 else:
+                    obj_color = CLASS_COLOR_PALETTE.get(
+                        obj["class_name"],
+                        ((hash(obj["class_name"]) * 45) % 256, (hash(obj["class_name"]) * 85) % 256, (hash(obj["class_name"]) * 125) % 256),
+                    )
                     fused_entities.append({
                         "type": "object",
                         "label": obj["class_name"],
@@ -234,7 +238,7 @@ class CombinedVisionEngine:
                         "box": obj["box"],
                         "sub_box": None,
                         "is_recognized_face": False,
-                        "color": (255, 0, 180) if obj["class_name"] == "laptop" else (0, 200, 255),
+                        "color": obj_color,
                     })
 
             for f_idx, face in enumerate(faces):
@@ -262,6 +266,10 @@ class CombinedVisionEngine:
                     "color": (0, 230, 70) if is_known else (0, 100, 255),
                 })
             for obj in objects:
+                obj_color = CLASS_COLOR_PALETTE.get(
+                    obj["class_name"],
+                    ((hash(obj["class_name"]) * 45) % 256, (hash(obj["class_name"]) * 85) % 256, (hash(obj["class_name"]) * 125) % 256),
+                )
                 fused_entities.append({
                     "type": "object",
                     "label": obj["class_name"],
@@ -269,7 +277,7 @@ class CombinedVisionEngine:
                     "box": obj["box"],
                     "sub_box": None,
                     "is_recognized_face": False,
-                    "color": (255, 100, 50),
+                    "color": obj_color,
                 })
 
         return VisionResult(faces=faces, objects=objects, fused_entities=fused_entities)
