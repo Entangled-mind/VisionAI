@@ -245,7 +245,7 @@ elif menu_choice == "📷 Live Vision Feed":
 
                 # Convert BGR to RGB for Streamlit display
                 rgb_frame = cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB)
-                frame_placeholder.image(rgb_frame, channels="RGB", use_container_width=True)
+                frame_placeholder.image(rgb_frame, channels="RGB", width="stretch")
 
                 # Update telemetry
                 fps_placeholder.metric("Inference Rate", f"{fps:.1f} FPS")
@@ -398,10 +398,10 @@ elif menu_choice == "🔍 Static Image Inspector":
         v_col1, v_col2 = st.columns(2)
         with v_col1:
             st.markdown(f"##### Original Image: `{image_name}`")
-            st.image(cv2.cvtColor(image_to_process, cv2.COLOR_BGR2RGB), use_container_width=True)
+            st.image(cv2.cvtColor(image_to_process, cv2.COLOR_BGR2RGB), width="stretch")
         with v_col2:
             st.markdown("##### Annotated Detections (All 80 COCO Classes & Faces)")
-            st.image(cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB), use_container_width=True)
+            st.image(cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB), width="stretch")
 
         st.markdown("#### Detected Entities Breakdown")
         if res.fused_entities:
@@ -482,15 +482,15 @@ elif menu_choice == "📊 Visual Analytics":
         ch_col1, ch_col2 = st.columns(2)
         with ch_col1:
             if "class_distribution" in chart_paths:
-                st.image(str(chart_paths["class_distribution"]), use_container_width=True)
+                st.image(str(chart_paths["class_distribution"]), width="stretch")
             if "confidence_distribution" in chart_paths:
-                st.image(str(chart_paths["confidence_distribution"]), use_container_width=True)
+                st.image(str(chart_paths["confidence_distribution"]), width="stretch")
 
         with ch_col2:
             if "face_breakdown" in chart_paths:
-                st.image(str(chart_paths["face_breakdown"]), use_container_width=True)
+                st.image(str(chart_paths["face_breakdown"]), width="stretch")
             if "timeline" in chart_paths:
-                st.image(str(chart_paths["timeline"]), use_container_width=True)
+                st.image(str(chart_paths["timeline"]), width="stretch")
 
 
 # ---------------------------------------------------------
