@@ -110,6 +110,7 @@
         <div class="viewport-toolbar">
           <button id="btn-toggle-camera" class="btn btn-primary">▶ Start Live Camera</button>
           <button id="btn-flip-camera" class="btn btn-secondary" title="Switch between front and back camera">🔄 Switch Camera</button>
+          <button id="btn-night-vision-live" class="btn btn-outline" title="Toggle Adaptive Night Vision">🌙 Night Vision: AUTO</button>
           <button id="btn-snapshot" class="btn btn-outline" disabled>📸 Take Snapshot</button>
           
           <div class="slider-control">
@@ -137,6 +138,10 @@
             <span id="tele-count" class="tele-val">0</span>
           </div>
           <div class="tele-item">
+            <span class="tele-label">AMBIENT LIGHT (LUX)</span>
+            <span id="tele-lum" class="tele-val">--%</span>
+          </div>
+          <div class="tele-item">
             <span class="tele-label">HARDWARE BACKEND</span>
             <span id="tele-backend" class="tele-val">WebGL</span>
           </div>
@@ -160,6 +165,8 @@
     <!-- Quick Sample Selectors -->
     <div class="sample-chips-row">
       <span class="chips-label">Quick Test Benchmark Samples:</span>
+      <button class="chip-btn chip-night" data-sample="assets/dark_lion_sample.jpg">🌙 Test Dark Lion (Low Light)</button>
+      <button class="chip-btn chip-night" data-sample="assets/dark_pen_sample.jpg">🌙 Test Dark Pen (Low Light)</button>
       <button class="chip-btn" data-sample="assets/lion_sample.jpg">🦁 Test Lion (lion_sample.jpg)</button>
       <button class="chip-btn" data-sample="assets/pen_sample.jpg">🖊️ Test Pen (pen_sample.jpg)</button>
       <button class="chip-btn" data-sample="assets/glasses_sample.jpg">👓 Test Glasses (glasses_sample.jpg)</button>
@@ -177,7 +184,7 @@
           <div class="dropzone-content">
             <span class="dropzone-icon">📁</span>
             <h3>Drag & Drop Image Here</h3>
-            <p>Supports JPG, PNG, WEBP, BMP — Upload photos of cats, dogs, animals, or objects</p>
+            <p>Supports JPG, PNG, WEBP, BMP — Upload photos in daylight, shadows, or darkness</p>
             <span class="btn btn-secondary btn-sm">Browse Local Files</span>
           </div>
         </div>
@@ -185,6 +192,25 @@
         <div class="slider-control" style="margin-top: 1rem;">
           <label for="static-conf-slider">Inspector Confidence Threshold: <span id="static-conf-val">30%</span></label>
           <input type="range" id="static-conf-slider" min="10" max="90" value="30" step="5">
+        </div>
+
+        <!-- Night Vision Enhancement Panel -->
+        <div class="night-panel">
+          <div class="night-panel-header">
+            <div class="night-panel-title">
+              <span>🌙</span>
+              <span>Night Vision AI Booster</span>
+            </div>
+            <select id="static-night-mode" class="night-select">
+              <option value="auto" selected>Auto Low-Light</option>
+              <option value="on">Always ON</option>
+              <option value="off">OFF (Standard)</option>
+            </select>
+          </div>
+          <div class="slider-control" style="margin: 0;">
+            <label for="static-night-gain">Exposure & Contrast Gain: <span id="static-night-gain-val">3.0x</span></label>
+            <input type="range" id="static-night-gain" min="10" max="50" value="30" step="5">
+          </div>
         </div>
       </div>
 
@@ -207,11 +233,19 @@
             <span id="static-res" class="tele-val">--</span>
           </div>
           <div class="tele-item">
+            <span class="tele-label">AMBIENT LUX</span>
+            <span id="static-lum" class="tele-val">--%</span>
+          </div>
+          <div class="tele-item">
+            <span class="tele-label">NIGHT VISION</span>
+            <span id="static-nv-status" class="tele-val">Off</span>
+          </div>
+          <div class="tele-item">
             <span class="tele-label">ANIMALS FOUND</span>
             <span id="static-animals" class="tele-val">0</span>
           </div>
           <div class="tele-item">
-            <span class="tele-label">TOOLS, PEOPLE & OBJECTS</span>
+            <span class="tele-label">TOOLS & OBJECTS</span>
             <span id="static-objects" class="tele-val">0</span>
           </div>
         </div>

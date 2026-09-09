@@ -1,4 +1,4 @@
-﻿/* =========================================================
+/* =========================================================
    VisionAI — Modern Dark Theme & Glassmorphism Design System
    ========================================================= */
 
@@ -907,3 +907,57 @@ p {
   color: var(--primary);
   text-decoration: none;
 }
+
+/* Night Vision Controls & Badge */
+.chip-night {
+  background: rgba(56, 189, 248, 0.12) !important;
+  border-color: rgba(56, 189, 248, 0.4) !important;
+  color: #38bdf8 !important;
+}
+.chip-night:hover {
+  background: rgba(56, 189, 248, 0.25) !important;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3) !important;
+}
+
+.night-panel {
+  margin-top: 1rem;
+  padding: 0.9rem 1.1rem;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: var(--radius-md);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+}
+
+.night-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+
+.night-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #38bdf8;
+}
+
+.night-select {
+  background: #1e293b;
+  color: #f1f5f9;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+}
+
+.night-select:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
+}
+
