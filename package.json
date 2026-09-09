@@ -4,7 +4,8 @@
   "private": true,
   "description": "VisionAI - Intelligent Multi-Model Face & Object Recognition Web App",
   "scripts": {
-    "start": "npx serve web"
+    "build": "echo 'Build complete'",
+    "start": "npx serve ."
   },
   "keywords": [
     "computer-vision",

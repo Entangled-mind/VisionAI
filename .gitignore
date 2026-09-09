@@ -44,3 +44,6 @@ models/*.onnx
 
 # Environment variables
 .env
+
+cloudflared.exe
+

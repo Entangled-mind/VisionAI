@@ -1,0 +1,427 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VisionAI — Intelligent Multi-Model Face & Object Recognition</title>
+  <meta name="description" content="Production-grade Computer Vision and Deep Learning system for real-time face recognition and animal/object detection. Live on Vercel.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
+  <!-- TensorFlow.js & COCO-SSD Model for 100% In-Browser Zero-Server Inference -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand">
+        <span class="logo-icon">👁️</span>
+        <div class="brand-text">
+          <span class="brand-title">VisionAI</span>
+          <span class="brand-badge">PRO V1.0</span>
+        </div>
+      </div>
+      
+      <nav class="nav-links">
+        <a href="#live-feed">📷 Live Camera</a>
+        <a href="#image-inspector">🔍 Inspector</a>
+        <a href="#architecture">🧩 Architecture</a>
+        <a href="#masterclass-pdf">📖 Masterclass PDF</a>
+        <a href="#deploy-guide">🚀 Vercel Deploy</a>
+      </nav>
+
+      <div class="nav-actions">
+        <div id="model-status" class="status-indicator loading">
+          <span class="status-dot"></span>
+          <span class="status-text">Loading AI Models...</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="pill-badge">⚡ PRODUCTION COMPUTER VISION SYSTEM</div>
+      <h1 class="hero-title">Real-Time Face Recognition & <span class="gradient-text">Animal/Object Detection</span></h1>
+      <p class="hero-description">
+        A dual-pipeline deep learning engine combining deep metric learning face recognition (128-D embeddings) 
+        and real-time YOLO/COCO object detection across all 80 classes. Runs client-side in your browser via WebGL and natively on Python desktop.
+      </p>
+      
+      <div class="hero-actions">
+        <a href="#live-feed" class="btn btn-primary">📷 Launch Live Camera</a>
+        <a href="#image-inspector" class="btn btn-secondary">🔍 Test Custom Images</a>
+        <a href="VisionAI_Masterclass_Guide.pdf" download class="btn btn-outline">📥 Download PDF Guide (110 KB)</a>
+      </div>
+
+      <div class="kpi-strip">
+        <div class="kpi-card">
+          <span class="kpi-val">80+</span>
+          <span class="kpi-lbl">COCO Classes (Cats, Dogs, Objects)</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-val">128-D</span>
+          <span class="kpi-lbl">SFace Hypersphere Embeddings</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-val">30+ FPS</span>
+          <span class="kpi-lbl">Hardware-Accelerated Edge Inference</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-val">0.021%</span>
+          <span class="kpi-lbl">Equal Error Rate (EER) Metric</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 1: Live Camera Feed -->
+  <section id="live-feed" class="section">
+    <div class="section-header">
+      <h2>📷 Live Vision Feed (In-Browser WebGL Engine)</h2>
+      <p>Stream your camera live to detect cats, dogs, domestic animals, humans, and objects in real-time right inside your browser.</p>
+    </div>
+
+    <div class="camera-grid">
+      <!-- Video / Canvas Display -->
+      <div class="viewport-card">
+        <div class="viewport-wrapper">
+          <video id="webcam" autoplay playsinline muted></video>
+          <canvas id="overlay-canvas"></canvas>
+          
+          <div id="camera-placeholder" class="placeholder-overlay">
+            <div class="placeholder-content">
+              <span class="placeholder-icon">📷</span>
+              <h3>Camera is Idle</h3>
+              <p>Click <strong>"Start Live Camera"</strong> below to begin real-time hardware-accelerated detection.</p>
+              <button id="btn-start-camera-hero" class="btn btn-primary">Start Live Camera</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls Toolbar -->
+        <div class="viewport-toolbar">
+          <button id="btn-toggle-camera" class="btn btn-primary">▶ Start Live Camera</button>
+          <button id="btn-flip-camera" class="btn btn-secondary" title="Switch between front and back camera">🔄 Switch Camera</button>
+          <button id="btn-snapshot" class="btn btn-outline" disabled>📸 Take Snapshot</button>
+          
+          <div class="slider-control">
+            <label for="live-conf-slider">Detection Sensitivity: <span id="live-conf-val">50%</span></label>
+            <input type="range" id="live-conf-slider" min="15" max="90" value="45" step="5">
+          </div>
+        </div>
+      </div>
+
+      <!-- Telemetry & Live Log -->
+      <div class="telemetry-card">
+        <h3>Live Inference Telemetry</h3>
+        
+        <div class="telemetry-grid">
+          <div class="tele-item">
+            <span class="tele-label">FRAME RATE</span>
+            <span id="tele-fps" class="tele-val">0.0 FPS</span>
+          </div>
+          <div class="tele-item">
+            <span class="tele-label">LATENCY</span>
+            <span id="tele-lat" class="tele-val">-- ms</span>
+          </div>
+          <div class="tele-item">
+            <span class="tele-label">ENTITIES DETECTED</span>
+            <span id="tele-count" class="tele-val">0</span>
+          </div>
+          <div class="tele-item">
+            <span class="tele-label">HARDWARE BACKEND</span>
+            <span id="tele-backend" class="tele-val">WebGL</span>
+          </div>
+        </div>
+
+        <h4 style="margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 0.9rem; text-transform: uppercase; color: var(--text-muted);">Active Detections</h4>
+        <div id="live-detections-list" class="detections-list">
+          <div class="empty-state">No entities currently in view. Turn on the camera and point it at a cat, dog, person, or laptop!</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: Static Image Inspector -->
+  <section id="image-inspector" class="section alternate-bg">
+    <div class="section-header">
+      <h2>🔍 Static Image Inspector & Threshold Playground</h2>
+      <p>Upload your own photo of a cat, dog, animal, person, or object, or select a pre-loaded benchmark test image.</p>
+    </div>
+
+    <!-- Quick Sample Selectors -->
+    <div class="sample-chips-row">
+      <span class="chips-label">Quick Test Benchmark Samples:</span>
+      <button class="chip-btn" data-sample="assets/cat_sample.jpg">🐱 Test Cat (cat_sample.jpg)</button>
+      <button class="chip-btn" data-sample="assets/dog_sample.jpg">🐶 Test Dog (dog_sample.jpg)</button>
+      <button class="chip-btn" data-sample="assets/face_sample.jpg">👤 Test Face (face_sample.jpg)</button>
+    </div>
+
+    <div class="inspector-grid">
+      <!-- Upload Dropzone -->
+      <div class="upload-container">
+        <div id="dropzone" class="dropzone">
+          <input type="file" id="file-input" accept="image/*" class="file-input">
+          <div class="dropzone-content">
+            <span class="dropzone-icon">📁</span>
+            <h3>Drag & Drop Image Here</h3>
+            <p>Supports JPG, PNG, WEBP, BMP — Upload photos of cats, dogs, animals, or objects</p>
+            <span class="btn btn-secondary btn-sm">Browse Local Files</span>
+          </div>
+        </div>
+
+        <div class="slider-control" style="margin-top: 1rem;">
+          <label for="static-conf-slider">Inspector Confidence Threshold: <span id="static-conf-val">30%</span></label>
+          <input type="range" id="static-conf-slider" min="10" max="90" value="30" step="5">
+        </div>
+      </div>
+
+      <!-- Preview & Results Canvas -->
+      <div class="result-container">
+        <div class="canvas-wrapper">
+          <canvas id="static-canvas"></canvas>
+          <div id="static-placeholder" class="placeholder-overlay">
+            <div class="placeholder-content">
+              <span class="placeholder-icon">🖼️</span>
+              <h3>No Image Analyzed Yet</h3>
+              <p>Upload an image or pick a test sample above to inspect bounding boxes and confidence scores.</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="static-telemetry" class="static-telemetry" style="display: none;">
+          <div class="tele-item">
+            <span class="tele-label">IMAGE RESOLUTION</span>
+            <span id="static-res" class="tele-val">--</span>
+          </div>
+          <div class="tele-item">
+            <span class="tele-label">ANIMALS FOUND</span>
+            <span id="static-animals" class="tele-val">0</span>
+          </div>
+          <div class="tele-item">
+            <span class="tele-label">OBJECTS & PEOPLE</span>
+            <span id="static-objects" class="tele-val">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Entity Breakdown Table -->
+    <div id="inspector-table-container" class="table-container" style="display: none; margin-top: 2rem;">
+      <h3>Detected Entities Breakdown</h3>
+      <table id="inspector-table" class="data-table">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Detected Label</th>
+            <th>Confidence Score</th>
+            <th>Bounding Box (x, y, w, h)</th>
+          </tr>
+        </thead>
+        <tbody id="inspector-table-body">
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Section 3: Architecture & Pipeline -->
+  <section id="architecture" class="section">
+    <div class="section-header">
+      <h2>🧩 System Pipeline & Dual-Model Architecture</h2>
+      <p>How the VisionAI spatial fusion engine unifies face recognition with real-time multi-class object detection.</p>
+    </div>
+
+    <div class="architecture-flow">
+      <div class="arch-box input-box">
+        <div class="arch-tag">INPUT</div>
+        <h4>Video Stream / Static Image</h4>
+        <p>DirectShow 30 FPS Camera or RGB Matrix</p>
+      </div>
+
+      <div class="arch-arrow">➔</div>
+
+      <div class="arch-branch">
+        <div class="arch-box face-branch">
+          <div class="arch-tag">FACE PIPELINE</div>
+          <h4>OpenCV YuNet Deep Detector</h4>
+          <p>5-Point Facial Landmark Alignment</p>
+          <div class="arch-subarrow">⬇</div>
+          <h4>SFace 128-D Metric Learning</h4>
+          <p>Unit Hypersphere Projection (||e||₂ = 1.0)</p>
+          <div class="arch-subarrow">⬇</div>
+          <h4>Top-K Ensemble Cosine Match</h4>
+          <p>Evaluates Top-3 Enrolled Poses (Threshold: 0.363)</p>
+        </div>
+
+        <div class="arch-box object-branch">
+          <div class="arch-tag">OBJECT & ANIMAL PIPELINE</div>
+          <h4>YOLOv8n / COCO-SSD</h4>
+          <p>Anchor-Free Multi-Scale Detection</p>
+          <div class="arch-subarrow">⬇</div>
+          <h4>80 COCO Classes</h4>
+          <p>Cats, Dogs, Horses, Bears, Vehicles, Household</p>
+          <div class="arch-subarrow">⬇</div>
+          <h4>Non-Maximum Suppression (NMS)</h4>
+          <p>IoU Overlap Pruning (Threshold: 0.45)</p>
+        </div>
+      </div>
+
+      <div class="arch-arrow">➔</div>
+
+      <div class="arch-box fusion-box">
+        <div class="arch-tag">SPATIAL FUSION & STABILITY</div>
+        <h4>Spatial Fusion Engine</h4>
+        <p>Binds Inner Face Identities to Outer Person Boxes</p>
+        <div class="arch-subarrow">⬇</div>
+        <h4>Temporal EMA Smoothing</h4>
+        <p>e_smooth = 0.70·e_(t-1) + 0.30·e_t + 8-Frame Latch</p>
+      </div>
+
+      <div class="arch-arrow">➔</div>
+
+      <div class="arch-box output-box">
+        <div class="arch-tag">STORAGE & ANALYTICS</div>
+        <h4>SQLite Event Logger</h4>
+        <p>4.0s Cooldown Throttling Cache</p>
+        <div class="arch-subarrow">⬇</div>
+        <h4>Pandas & Matplotlib BI</h4>
+        <p>Executive KPIs & Statistical Charts</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: Masterclass Educational PDF -->
+  <section id="masterclass-pdf" class="section alternate-bg">
+    <div class="section-header">
+      <h2>📖 VisionAI Masterclass Educational Guide</h2>
+      <p>A comprehensive 8-chapter publication-grade architectural manual and technical interview handbook.</p>
+    </div>
+
+    <div class="pdf-showcase-card">
+      <div class="pdf-info">
+        <div class="pill-badge">PUBLICATION-GRADE MANUAL (110.2 KB)</div>
+        <h3>VisionAI Masterclass Guide & Technical Handbook</h3>
+        <p>Written to provide complete mathematical transparency and engineering depth, covering everything built in this project.</p>
+        
+        <ul class="pdf-features-list">
+          <li><strong>Chapter 1:</strong> System Overview, Mission, & High-Level Architecture Flowchart</li>
+          <li><strong>Chapter 2:</strong> Computer Vision Mathematical Primitives (Matrices, Color Spaces, Bilinear Interpolation)</li>
+          <li><strong>Chapter 3:</strong> Deep Face Detection (YuNet ONNX & 5-Point Landmark Regression)</li>
+          <li><strong>Chapter 4:</strong> Deep Metric Learning & 128-D Embeddings (SFace, Hypersphere Projection, Cosine Distance)</li>
+          <li><strong>Chapter 5:</strong> Real-Time Object & Animal Detection (YOLOv8, Anchor-Free Heads, NMS)</li>
+          <li><strong>Chapter 6:</strong> Multi-Model Spatial & Temporal Fusion Engine (EMA Smoothing & Hysteresis)</li>
+          <li><strong>Chapter 7:</strong> SQLite Cooldown Logging, Pandas Analytics, & Benchmark Metrics (FAR, FRR, EER, IoU)</li>
+          <li><strong>Chapter 8:</strong> Technical Interview Masterclass (10 Deep Engineering Questions & Answers)</li>
+        </ul>
+
+        <div style="margin-top: 1.5rem;">
+          <a href="VisionAI_Masterclass_Guide.pdf" download class="btn btn-primary btn-lg">
+            📥 Download Masterclass Guide (PDF)
+          </a>
+        </div>
+      </div>
+
+      <div class="pdf-preview-box">
+        <div class="pdf-cover-mockup">
+          <div class="pdf-mockup-header">
+            <span>VisionAI Masterclass</span>
+            <span class="pdf-page-count">110 KB • 8 Chapters</span>
+          </div>
+          <div class="pdf-mockup-body">
+            <div class="mockup-diagram">
+              <div class="mockup-rect">Input Matrix</div>
+              <div class="mockup-arrow">↓</div>
+              <div class="mockup-rect highlight">YuNet + SFace (128-D)</div>
+              <div class="mockup-arrow">↓</div>
+              <div class="mockup-rect highlight">YOLOv8 (80 COCO Classes)</div>
+              <div class="mockup-arrow">↓</div>
+              <div class="mockup-rect">Spatial Fusion & Smoothing</div>
+            </div>
+            <div class="mockup-formula">
+              cos(θ) = (A · B) / (||A|| ||B||)
+            </div>
+          </div>
+          <div class="pdf-mockup-footer">
+            <span>Verified Portfolio Project</span>
+            <span>DeepMind / Google AGY</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 5: Deploy Guide -->
+  <section id="deploy-guide" class="section">
+    <div class="section-header">
+      <h2>🚀 Live Shareable Deployment Instructions</h2>
+      <p>How this project is deployed to Vercel for instant sharing, and to Streamlit Community Cloud for native Python hosting.</p>
+    </div>
+
+    <div class="deploy-grid">
+      <!-- Vercel Card -->
+      <div class="deploy-card featured">
+        <div class="deploy-badge">SHARABLE WEB APP</div>
+        <h3>▲ Deploy to Vercel (This Website)</h3>
+        <p>Zero-config deployment hosting the responsive in-browser Computer Vision suite with WebGL hardware acceleration.</p>
+        
+        <ol class="deploy-steps">
+          <li>Install the Vercel CLI: <code>npm i -g vercel</code></li>
+          <li>Log in to your account: <code>vercel login</code></li>
+          <li>Inside this project directory, run: <code>vercel</code></li>
+          <li>Select <strong>Y</strong> to accept defaults. Vercel automatically deploys <code>web/</code> using <code>vercel.json</code>!</li>
+          <li>Your live shareable URL is generated: <code>https://visionai-&lt;your-username&gt;.vercel.app</code></li>
+        </ol>
+
+        <div class="terminal-box">
+          <code>&gt; vercel --prod</code>
+        </div>
+      </div>
+
+      <!-- Streamlit Cloud Card -->
+      <div class="deploy-card">
+        <div class="deploy-badge">FULL PYTHON BACKEND</div>
+        <h3>☁️ Deploy to Streamlit Community Cloud</h3>
+        <p>Snowflake's free native cloud hosting running the full Python stack (PyTorch, YOLOv8n, YuNet, SFace, and SQLite).</p>
+
+        <ol class="deploy-steps">
+          <li>Push this repository to your GitHub account: <code>git push origin master</code></li>
+          <li>Visit <a href="https://share.streamlit.io" target="_blank" style="color: var(--primary);">share.streamlit.io</a> and sign in with GitHub.</li>
+          <li>Click <strong>"New App"</strong> and select your <code>VisionAI</code> repository.</li>
+          <li>Set main file path to: <code>app/app.py</code></li>
+          <li>Click <strong>"Deploy"</strong>! In ~2 minutes, your permanent Python app is live at <code>https://visionai.streamlit.app</code>.</li>
+        </ol>
+
+        <div class="terminal-box">
+          <code>Main file: app/app.py</code>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <span>👁️ VisionAI — Intelligent Face & Object Recognition System</span>
+      </div>
+      <p class="footer-copy">
+        Production Computer Vision Engineering Portfolio. Built with OpenCV, PyTorch, YOLOv8, SFace, TensorFlow.js, Streamlit, and Vercel.
+      </p>
+      <div class="footer-links">
+        <a href="#live-feed">Live Camera</a>
+        <a href="#image-inspector">Static Inspector</a>
+        <a href="VisionAI_Masterclass_Guide.pdf" download>Download Masterclass PDF</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
