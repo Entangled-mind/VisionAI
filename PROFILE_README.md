@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="https://raw.githubusercontent.com/Entangled-mind/VisionAI/master/assets/github_profile_banner.jpg" alt="Entangled-mind Profile Banner" width="100%" style="border-radius: 12px; margin-bottom: 1.2rem;" />
+
 # Hi there, I'm Entangled-mind 👋
 ### *AI Engineer · Computer Vision Specialist · Edge Machine Learning Architect*
 

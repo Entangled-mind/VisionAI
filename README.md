@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="https://raw.githubusercontent.com/Entangled-mind/VisionAI/master/assets/github_profile_banner.jpg" alt="VisionAI Hero Banner" width="100%" style="border-radius: 12px; margin-bottom: 1.2rem;" />
+
 # 👁️ VisionAI — Intelligent Face & Object Recognition Engine
 ### *Production-Grade Dual-Pipeline Computer Vision with Real-Time Night Vision Enhancement*
 
@@ -41,6 +43,10 @@ Engineered to operate seamlessly across both **native Python desktop environment
 │  🌙 LOW-LIGHT NIGHT VISION ENGINE: Adaptive Retinex 256-LUT Tone Mapping (<6ms per 1080p frame) │
 └────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/Entangled-mind/VisionAI/master/assets/visionai_poster.jpg" alt="VisionAI Promotional Poster" width="65%" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-top: 1rem;" />
+</div>
 
 ---
 
