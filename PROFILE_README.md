@@ -66,7 +66,7 @@
 ## 🌟 Featured Projects
 
 ### 👁️ [VisionAI — Intelligent Multi-Model Computer Vision Engine](https://github.com/Entangled-mind/VisionAI)
-> **[🌐 Live Web Demo](https://visionnn-ai.vercel.app)** · **[📖 Masterclass PDF Guide](https://github.com/Entangled-mind/VisionAI/blob/master/VisionAI_Masterclass_Guide.pdf)**
+> **[🚀 Live Web App (Vercel)](https://visionnn-ai.vercel.app)** · **[⚡ Cloudflare Mirror](https://probability-foundation-contributor-necessarily.trycloudflare.com)** · **[📊 Python Streamlit Dashboard](https://distributions-zones-myself-findlaw.trycloudflare.com)** · **[📖 Masterclass PDF Guide](https://github.com/Entangled-mind/VisionAI/blob/master/VisionAI_Masterclass_Guide.pdf)**
 
 A production-grade dual-pipeline computer vision system featuring:
 - **Deep Metric Learning**: YuNet 5-point landmark detector + SFace 128-D hypersphere embeddings for real-time face verification ($\text{FAR} < 0.1\%$).
@@ -77,6 +77,21 @@ A production-grade dual-pipeline computer vision system featuring:
 ```text
 Key Technologies: Python, PyTorch, OpenCV YuNet/SFace, YOLOv8, TensorFlow.js, WebGL, SQLite, Streamlit
 ```
+
+### 🧠 [VitalPulse AI — Precision ML Health & Lifestyle Platform](https://github.com/Entangled-mind/vitalpulse-health-ai)
+> **[🐙 GitHub Repository](https://github.com/Entangled-mind/vitalpulse-health-ai)** · **FastAPI · Scikit-Learn · Chronobiology Lifestyle Engine**
+
+End-to-end Machine Learning web platform assessing holistic human health and lifestyle strain:
+- **Multi-Target ML Engine**: Gradient Boosting Regressor ($R^2 = 0.9713$) predicting vitality score + Random Forest ($94.29\%$ accuracy) predicting burnout risk.
+- **Explainable AI (XAI)**: Dynamic factor attribution isolating positive sleep drivers vs. negative screen time and workload strain.
+- **Interactive Visuals**: 5-dimensional wellness radar charts, chronobiology prescriptions, and shareable health reports.
+
+### 🏥 [Healthcare & Patient Wellness BI Analytics](https://github.com/Entangled-mind/healthcare-patient-wellness-bi)
+> **[🐙 GitHub Repository](https://github.com/Entangled-mind/healthcare-patient-wellness-bi)** · **Machine Learning · Power BI · Tableau**
+
+Clinical lifestyle intelligence and diagnostic machine learning system:
+- **Clinical Predictive Modeling**: Random Forest classifier achieving **92.55% accuracy** predicting sleep disorders (Insomnia, Sleep Apnea) from biometric biomarkers.
+- **Enterprise BI Packs**: Star schema dimensional modeling, Power Query M-code, DAX measures, and pre-configured Tableau workbooks.
 
 ---
 

@@ -173,58 +173,128 @@ function resolveEntityInfo(rawLabel) {
     return { title: "Cow / Cattle", category: "Animal", emoji: "🐄", stroke: "#e2e8f0", fill: "rgba(226, 232, 240, 0.22)", badge: "#334155" };
   }
 
-  // Everyday Tools & Stationery
+  // Everyday Tools, Stationery & Writing Instruments
   if (lower.includes("ballpoint") || lower.includes("ballpen") || lower.includes("biro")) {
     return { title: "Ballpoint Pen", category: "Stationery / Tool", emoji: "🖊️", stroke: "#06b6d4", fill: "rgba(6, 182, 212, 0.22)", badge: "#0891b2" };
   }
   if (lower.includes("fountain pen")) {
     return { title: "Fountain Pen", category: "Stationery / Tool", emoji: "✒️", stroke: "#3b82f6", fill: "rgba(59, 130, 246, 0.22)", badge: "#2563eb" };
   }
-  if (lower.includes("pen") && !lower.includes("penguin") && !lower.includes("open")) {
+  if (lower.includes("pencil") || lower.includes("pencil case") || lower.includes("pencil box") || lower.includes("lead")) {
+    return { title: "Pencil", category: "Stationery / Tool", emoji: "✏️", stroke: "#f59e0b", fill: "rgba(245, 158, 11, 0.22)", badge: "#d97706" };
+  }
+  if (lower.includes("pen") && !lower.includes("penguin") && !lower.includes("open") && !lower.includes("happen")) {
     return { title: "Pen", category: "Stationery / Tool", emoji: "🖊️", stroke: "#06b6d4", fill: "rgba(6, 182, 212, 0.22)", badge: "#0891b2" };
+  }
+  if (lower.includes("eraser") || lower.includes("rubber")) {
+    return { title: "Eraser", category: "Stationery / Tool", emoji: "🧼", stroke: "#ec4899", fill: "rgba(236, 72, 153, 0.22)", badge: "#db2777" };
+  }
+  if (lower.includes("ruler") || lower.includes("rule") || lower.includes("tape measure")) {
+    return { title: "Ruler / Scale", category: "Stationery / Tool", emoji: "📏", stroke: "#eab308", fill: "rgba(234, 179, 8, 0.22)", badge: "#ca8a04" };
+  }
+  if (lower.includes("scissors")) {
+    return { title: "Scissors", category: "Stationery / Tool", emoji: "✂️", stroke: "#f43f5e", fill: "rgba(244, 63, 94, 0.22)", badge: "#e11d48" };
+  }
+  if (lower.includes("stapler") || lower.includes("paperclip")) {
+    return { title: "Stapler / Clip", category: "Stationery / Tool", emoji: "📎", stroke: "#8b5cf6", fill: "rgba(139, 92, 246, 0.22)", badge: "#7c3aed" };
   }
   if (lower.includes("notebook") || lower.includes("binder") || lower.includes("copy") || lower.includes("spiral")) {
     return { title: "Notebook / Copy", category: "Stationery / Tool", emoji: "📓", stroke: "#8b5cf6", fill: "rgba(139, 92, 246, 0.22)", badge: "#7c3aed" };
   }
-  if (lower.includes("book") || lower.includes("booklet") || lower.includes("dust cover")) {
+  if (lower.includes("book") || lower.includes("booklet") || lower.includes("dust cover") || lower.includes("novel")) {
     return { title: "Book", category: "Stationery / Tool", emoji: "📖", stroke: "#a855f7", fill: "rgba(168, 85, 247, 0.22)", badge: "#9333ea" };
   }
-  if (lower.includes("spectacle") || lower.includes("eyeglass") || (lower.includes("glasses") && !lower.includes("dark glasses"))) {
+
+  // Personal Accessories & Wearables
+  if (lower.includes("spectacle") || lower.includes("specs") || lower.includes("eyeglass") || lower.includes("eyeglasses") || (lower.includes("glasses") && !lower.includes("dark glasses") && !lower.includes("drinking glasses"))) {
     return { title: "Glasses / Spectacles", category: "Accessories", emoji: "👓", stroke: "#14b8a6", fill: "rgba(20, 184, 166, 0.22)", badge: "#0d9488" };
   }
-  if (lower.includes("sunglass") || lower.includes("dark glasses") || lower.includes("shades")) {
+  if (lower.includes("sunglass") || lower.includes("sunglasses") || lower.includes("dark glasses") || lower.includes("shades")) {
     return { title: "Sunglasses", category: "Accessories", emoji: "🕶️", stroke: "#0ea5e9", fill: "rgba(14, 165, 233, 0.22)", badge: "#0284c7" };
   }
-  if (lower.includes("cellular") || lower.includes("cellphone") || lower.includes("phone") || lower.includes("cell phone")) {
-    return { title: "Smartphone / Phone", category: "Electronics", emoji: "📱", stroke: "#6366f1", fill: "rgba(99, 102, 241, 0.22)", badge: "#4f46e5" };
+  if (lower.includes("wristwatch") || lower.includes("digital watch") || lower.includes("stopwatch") || (lower.includes("watch") && !lower.includes("water") && !lower.includes("match"))) {
+    return { title: "Wristwatch / Smartwatch", category: "Accessories", emoji: "⌚", stroke: "#06b6d4", fill: "rgba(6, 182, 212, 0.22)", badge: "#0891b2" };
+  }
+  if (lower.includes("clock") || lower.includes("wall clock") || lower.includes("analog clock") || lower.includes("alarm clock")) {
+    return { title: "Clock", category: "Accessories", emoji: "⏰", stroke: "#eab308", fill: "rgba(234, 179, 8, 0.22)", badge: "#ca8a04" };
   }
   if (lower.includes("backpack") || lower.includes("knapsack") || lower.includes("rucksack")) {
     return { title: "Backpack / School Bag", category: "Everyday Item", emoji: "🎒", stroke: "#ec4899", fill: "rgba(236, 72, 153, 0.22)", badge: "#db2777" };
   }
-  if (lower.includes("handbag") || lower.includes("purse") || lower.includes("pocketbook") || (lower.includes("bag") && !lower.includes("mailbag"))) {
+  if (lower.includes("handbag") || lower.includes("purse") || lower.includes("pocketbook") || (lower.includes("bag") && !lower.includes("mailbag") && !lower.includes("sleeping bag"))) {
     return { title: "Handbag / Bag", category: "Everyday Item", emoji: "👜", stroke: "#f43f5e", fill: "rgba(244, 63, 94, 0.22)", badge: "#e11d48" };
   }
-  if (lower.includes("chair") || lower.includes("rocker") || lower.includes("stool")) {
-    return { title: "Chair", category: "Furniture", emoji: "🪑", stroke: "#10b981", fill: "rgba(16, 185, 129, 0.22)", badge: "#059669" };
+  if (lower.includes("wallet") || lower.includes("billfold")) {
+    return { title: "Wallet", category: "Everyday Item", emoji: "👛", stroke: "#f59e0b", fill: "rgba(245, 158, 11, 0.22)", badge: "#d97706" };
   }
-  if (lower.includes("desk") || lower.includes("table") || lower.includes("dining table")) {
-    return { title: "Table / Desk", category: "Furniture", emoji: "🪵", stroke: "#84cc16", fill: "rgba(132, 204, 22, 0.22)", badge: "#65a30d" };
+  if (lower.includes("key") || lower.includes("keys") || lower.includes("keychain") || lower.includes("padlock")) {
+    return { title: "Keys / Lock", category: "Everyday Item", emoji: "🔑", stroke: "#eab308", fill: "rgba(234, 179, 8, 0.22)", badge: "#ca8a04" };
+  }
+  if (lower.includes("shoe") || lower.includes("sneaker") || lower.includes("running shoe") || lower.includes("sandal") || lower.includes("boot")) {
+    return { title: "Shoes / Footwear", category: "Everyday Item", emoji: "👟", stroke: "#10b981", fill: "rgba(16, 185, 129, 0.22)", badge: "#059669" };
+  }
+  if (lower.includes("umbrella")) {
+    return { title: "Umbrella", category: "Everyday Item", emoji: "☂️", stroke: "#06b6d4", fill: "rgba(6, 182, 212, 0.22)", badge: "#0891b2" };
+  }
+
+  // Electronics & Desk Devices
+  if (lower.includes("cellular") || lower.includes("cellphone") || lower.includes("phone") || lower.includes("cell phone") || lower.includes("mobile")) {
+    return { title: "Smartphone / Phone", category: "Electronics", emoji: "📱", stroke: "#6366f1", fill: "rgba(99, 102, 241, 0.22)", badge: "#4f46e5" };
   }
   if (lower.includes("laptop") || lower.includes("notebook computer")) {
     return { title: "Laptop Computer", category: "Electronics", emoji: "💻", stroke: "#38bdf8", fill: "rgba(56, 189, 248, 0.22)", badge: "#0284c7" };
   }
-  if (lower.includes("mouse") && (lower.includes("computer") || lower.includes("optical"))) {
+  if (lower.includes("mouse") && (lower.includes("computer") || lower.includes("optical") || lower.includes("trackball"))) {
     return { title: "Computer Mouse", category: "Electronics", emoji: "🖱️", stroke: "#a855f7", fill: "rgba(168, 85, 247, 0.22)", badge: "#9333ea" };
   }
   if (lower.includes("keyboard") || lower.includes("keypad")) {
     return { title: "Keyboard", category: "Electronics", emoji: "⌨️", stroke: "#a855f7", fill: "rgba(168, 85, 247, 0.22)", badge: "#9333ea" };
   }
-  if (lower.includes("bottle")) {
-    return { title: "Bottle", category: "Everyday Item", emoji: "🍾", stroke: "#06b6d4", fill: "rgba(6, 182, 212, 0.22)", badge: "#0891b2" };
+  if (lower.includes("headphone") || lower.includes("headphones") || lower.includes("headset") || lower.includes("earphone") || lower.includes("earbuds")) {
+    return { title: "Headphones / Headset", category: "Electronics", emoji: "🎧", stroke: "#8b5cf6", fill: "rgba(139, 92, 246, 0.22)", badge: "#7c3aed" };
   }
-  if (lower.includes("cup") || lower.includes("mug")) {
-    return { title: "Cup / Mug", category: "Everyday Item", emoji: "☕", stroke: "#14b8a6", fill: "rgba(20, 184, 166, 0.22)", badge: "#0d9488" };
+  if (lower.includes("remote") || lower.includes("remote control")) {
+    return { title: "Remote Control", category: "Electronics", emoji: "🎮", stroke: "#3b82f6", fill: "rgba(59, 130, 246, 0.22)", badge: "#2563eb" };
   }
+  if (lower.includes("monitor") || lower.includes("screen") || lower.includes("display") || lower.includes("television") || lower.includes("tv")) {
+    return { title: "Monitor / Screen", category: "Electronics", emoji: "🖥️", stroke: "#0ea5e9", fill: "rgba(14, 165, 233, 0.22)", badge: "#0284c7" };
+  }
+
+  // Kitchenware & Drinkware
+  if (lower.includes("coffee mug") || (lower.includes("mug") && !lower.includes("smug"))) {
+    return { title: "Coffee Mug / Cup", category: "Kitchenware", emoji: "☕", stroke: "#f59e0b", fill: "rgba(245, 158, 11, 0.22)", badge: "#d97706" };
+  }
+  if (lower.includes("cup") && !lower.includes("cupboard") && !lower.includes("world cup")) {
+    return { title: "Cup / Drinkware", category: "Kitchenware", emoji: "🥛", stroke: "#14b8a6", fill: "rgba(20, 184, 166, 0.22)", badge: "#0d9488" };
+  }
+  if (lower.includes("bottle") || lower.includes("water bottle")) {
+    return { title: "Water Bottle", category: "Kitchenware", emoji: "🍾", stroke: "#06b6d4", fill: "rgba(6, 182, 212, 0.22)", badge: "#0891b2" };
+  }
+  if (lower.includes("plate") || lower.includes("dish") || lower.includes("saucer")) {
+    return { title: "Plate / Dish", category: "Kitchenware", emoji: "🍽️", stroke: "#94a3b8", fill: "rgba(148, 163, 184, 0.22)", badge: "#64748b" };
+  }
+  if (lower.includes("bowl") || lower.includes("soup bowl")) {
+    return { title: "Bowl", category: "Kitchenware", emoji: "🥣", stroke: "#e2e8f0", fill: "rgba(226, 232, 240, 0.22)", badge: "#475569" };
+  }
+  if (lower.includes("fork") || lower.includes("spoon") || lower.includes("knife") || lower.includes("cutlery")) {
+    return { title: "Cutlery / Utensil", category: "Kitchenware", emoji: "🍴", stroke: "#38bdf8", fill: "rgba(56, 189, 248, 0.22)", badge: "#0284c7" };
+  }
+
+  // Furniture & Home
+  if (lower.includes("chair") || lower.includes("rocker") || lower.includes("stool") || lower.includes("armchair")) {
+    return { title: "Chair", category: "Furniture", emoji: "🪑", stroke: "#10b981", fill: "rgba(16, 185, 129, 0.22)", badge: "#059669" };
+  }
+  if (lower.includes("desk") || lower.includes("table") || lower.includes("dining table")) {
+    return { title: "Table / Desk", category: "Furniture", emoji: "🪵", stroke: "#84cc16", fill: "rgba(132, 204, 22, 0.22)", badge: "#65a30d" };
+  }
+  if (lower.includes("lamp") || lower.includes("table lamp") || lower.includes("lampshade")) {
+    return { title: "Desk Lamp", category: "Furniture", emoji: "💡", stroke: "#facc15", fill: "rgba(250, 204, 21, 0.22)", badge: "#eab308" };
+  }
+  if (lower.includes("couch") || lower.includes("sofa") || lower.includes("bed") || lower.includes("pillow")) {
+    return { title: "Furniture", category: "Furniture", emoji: "🛋️", stroke: "#a855f7", fill: "rgba(168, 85, 247, 0.22)", badge: "#9333ea" };
+  }
+
+  // People
   if (lower.includes("person") || lower.includes("human") || lower.includes("man") || lower.includes("woman")) {
     return { title: "Person", category: "Person", emoji: "👤", stroke: "#38bdf8", fill: "rgba(56, 189, 248, 0.22)", badge: "#0284c7" };
   }
@@ -268,6 +338,125 @@ function resolveEntityInfo(rawLabel) {
     fill: "rgba(99, 102, 241, 0.22)", 
     badge: "#4f46e5" 
   };
+}
+
+// ---------------------------------------------------------------------------
+// 1B. Spatial Patches & Non-Maximum Suppression (NMS) Engine
+// ---------------------------------------------------------------------------
+function computeIoU(boxA, boxB) {
+  const [ax, ay, aw, ah] = boxA;
+  const [bx, by, bw, bh] = boxB;
+
+  const x1 = Math.max(ax, bx);
+  const y1 = Math.max(ay, by);
+  const x2 = Math.min(ax + aw, bx + bw);
+  const y2 = Math.min(ay + ah, by + bh);
+
+  const interW = Math.max(0, x2 - x1);
+  const interH = Math.max(0, y2 - y1);
+  const interArea = interW * interH;
+
+  const areaA = aw * ah;
+  const areaB = bw * bh;
+  const unionArea = areaA + areaB - interArea;
+
+  if (unionArea <= 0) return 0;
+  return interArea / unionArea;
+}
+
+function applyNMS(candidates, iouThreshold = 0.40) {
+  candidates.sort((a, b) => b.score - a.score);
+  const selected = [];
+
+  for (const cand of candidates) {
+    let keep = true;
+    for (const prev of selected) {
+      const iou = computeIoU(cand.bbox, prev.bbox);
+      if (iou > iouThreshold) {
+        // If same entity or redundant category, keep the higher confidence one
+        if (cand.info.title === prev.info.title || cand.info.category === "Object" || prev.info.category === "Object") {
+          keep = false;
+          break;
+        }
+      }
+    }
+    if (keep) {
+      selected.push(cand);
+    }
+  }
+  return selected;
+}
+
+function extractForegroundSaliencyBox(source) {
+  const w = source.naturalWidth || source.videoWidth || source.width || 640;
+  const h = source.naturalHeight || source.videoHeight || source.height || 480;
+
+  const tw = 96;
+  const th = 96;
+  const thumbCanvas = document.createElement("canvas");
+  thumbCanvas.width = tw;
+  thumbCanvas.height = th;
+  const thumbCtx = thumbCanvas.getContext("2d", { willReadFrequently: true });
+  thumbCtx.drawImage(source, 0, 0, tw, th);
+  const data = thumbCtx.getImageData(0, 0, tw, th).data;
+
+  // Background estimation from corners
+  const cornerIndices = [0, (tw - 1) * 4, (th - 1) * tw * 4, ((th - 1) * tw + (tw - 1)) * 4];
+  let bgR = 0, bgG = 0, bgB = 0;
+  for (const idx of cornerIndices) {
+    bgR += data[idx];
+    bgG += data[idx + 1];
+    bgB += data[idx + 2];
+  }
+  bgR /= 4; bgG /= 4; bgB /= 4;
+
+  let minX = tw, maxX = 0, minY = th, maxY = 0;
+  let count = 0;
+
+  for (let y = 0; y < th; y++) {
+    for (let x = 0; x < tw; x++) {
+      const i = (y * tw + x) * 4;
+      const dr = Math.abs(data[i] - bgR);
+      const dg = Math.abs(data[i + 1] - bgG);
+      const db = Math.abs(data[i + 2] - bgB);
+      const diff = (dr + dg + db) / 3;
+
+      if (diff > 25) {
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+        count++;
+      }
+    }
+  }
+
+  const coverage = count / (tw * th);
+  if (coverage >= 0.008 && coverage <= 0.92 && minX < maxX && minY < maxY) {
+    const scaleX = w / tw;
+    const scaleY = h / th;
+    const pad = 12;
+    const bx = Math.max(0, Math.round(minX * scaleX - pad));
+    const by = Math.max(0, Math.round(minY * scaleY - pad));
+    const bw = Math.min(w - bx, Math.round((maxX - minX + 2) * scaleX + pad * 2));
+    const bh = Math.min(h - by, Math.round((maxY - minY + 2) * scaleY + pad * 2));
+    return [bx, by, bw, bh];
+  }
+  return null;
+}
+
+function extractSpatialPatches(source) {
+  const w = source.naturalWidth || source.videoWidth || source.width || 640;
+  const h = source.naturalHeight || source.videoHeight || source.height || 480;
+
+  return [
+    { name: "Top-Left", box: [0, 0, Math.round(w * 0.58), Math.round(h * 0.58)] },
+    { name: "Top-Right", box: [Math.round(w * 0.42), 0, Math.round(w * 0.58), Math.round(h * 0.58)] },
+    { name: "Bottom-Left", box: [0, Math.round(h * 0.42), Math.round(w * 0.58), Math.round(h * 0.58)] },
+    { name: "Bottom-Right", box: [Math.round(w * 0.42), Math.round(h * 0.42), Math.round(w * 0.58), Math.round(h * 0.58)] },
+    { name: "Center-Focus", box: [Math.round(w * 0.20), Math.round(h * 0.20), Math.round(w * 0.60), Math.round(h * 0.60)] },
+    { name: "Lower-Desk", box: [Math.round(w * 0.15), Math.round(h * 0.35), Math.round(w * 0.70), Math.round(h * 0.60)] }
+  ];
 }
 
 // ---------------------------------------------------------------------------
@@ -519,9 +708,9 @@ async function analyzeStaticImage(imgSrc, imageName = "Image") {
     }
 
     const minConf = parseFloat(staticConfSlider.value) / 100;
-    let detections = [];
+    let candidateDetections = [];
 
-    // 4. Run COCO-SSD for candidate spatial boxes
+    // 4. Run COCO-SSD for candidate spatial anchor boxes
     let cocoPredictions = [];
     try {
       if (cocoModel) {
@@ -531,9 +720,90 @@ async function analyzeStaticImage(imgSrc, imageName = "Image") {
       console.warn("[VisionAI] COCO detection error:", err);
     }
 
-    const validCoco = cocoPredictions.filter(p => p.score >= Math.max(0.12, minConf * 0.65));
+    const validCoco = cocoPredictions.filter(p => p.score >= Math.max(0.10, minConf * 0.55));
 
-    // 5. Classify full image with MobileNet
+    // Shared offscreen scratch canvas for neural crops
+    const cropCanvas = document.createElement("canvas");
+    const cropCtx = cropCanvas.getContext("2d", { willReadFrequently: true });
+
+    // 5A. Foreground High-Contrast Saliency Discovery
+    // Tightly bounds small or prominent standalone items (pens, notebooks, glasses on desks)
+    const saliencyBox = extractForegroundSaliencyBox(inferenceSource);
+    if (saliencyBox && classifierModel) {
+      const [sx, sy, sw, sh] = saliencyBox;
+      if (sw >= 20 && sh >= 20) {
+        cropCanvas.width = sw;
+        cropCanvas.height = sh;
+        cropCtx.drawImage(inferenceSource, sx, sy, sw, sh, 0, 0, sw, sh);
+        try {
+          const saliencyClasses = await classifierModel.classify(cropCanvas, 4);
+          if (saliencyClasses && saliencyClasses.length > 0) {
+            const topSal = saliencyClasses[0];
+            const salInfo = resolveEntityInfo(topSal.className);
+            if (topSal.probability >= 0.15 && salInfo.category !== "Object") {
+              candidateDetections.push({
+                bbox: [sx, sy, sw, sh],
+                info: salInfo,
+                score: Math.min(0.96, Math.max(0.40, topSal.probability * 1.5)),
+                isNightVision: shouldEngageNightVision
+              });
+            }
+          }
+        } catch (e) {
+          console.warn("[VisionAI] Saliency classification error:", e);
+        }
+      }
+    }
+
+    // 5B. Multi-Scale Spatial Quadrants & Center Dense Scan
+    // Uncovers small desktop tools occupying <5% of whole frame
+    const spatialPatches = extractSpatialPatches(inferenceSource);
+    if (classifierModel) {
+      for (const patch of spatialPatches) {
+        const [px, py, pw, ph] = patch.box;
+        if (pw < 35 || ph < 35) continue;
+
+        cropCanvas.width = pw;
+        cropCanvas.height = ph;
+        cropCtx.drawImage(inferenceSource, px, py, pw, ph, 0, 0, pw, ph);
+
+        try {
+          const patchClasses = await classifierModel.classify(cropCanvas, 3);
+          if (patchClasses && patchClasses.length > 0) {
+            const top = patchClasses[0];
+            const info = resolveEntityInfo(top.className);
+            const lowerName = top.className.toLowerCase();
+
+            const isEverydayTarget = 
+              info.category === "Stationery / Tool" || 
+              info.category === "Accessories" || 
+              info.category === "Kitchenware" ||
+              info.category === "Animal" ||
+              (info.category === "Electronics" && !lowerName.includes("screen") && !lowerName.includes("monitor"));
+
+            if (isEverydayTarget && top.probability >= 0.18) {
+              // Attempt to tighten box using sub-patch saliency
+              const patchSaliency = extractForegroundSaliencyBox(cropCanvas);
+              let bbox = [px, py, pw, ph];
+              if (patchSaliency) {
+                bbox = [px + patchSaliency[0], py + patchSaliency[1], patchSaliency[2], patchSaliency[3]];
+              }
+
+              candidateDetections.push({
+                bbox: bbox,
+                info: info,
+                score: Math.min(0.95, top.probability * 1.25),
+                isNightVision: shouldEngageNightVision
+              });
+            }
+          }
+        } catch (patchErr) {
+          console.warn("[VisionAI] Patch scanning error:", patchErr);
+        }
+      }
+    }
+
+    // 5C. Global Full-Image MobileNet Classification
     let fullImageClasses = [];
     try {
       if (classifierModel) {
@@ -543,110 +813,92 @@ async function analyzeStaticImage(imgSrc, imageName = "Image") {
       console.warn("[VisionAI] Full-frame classification error:", err);
     }
 
-    // 6. Process candidate bounding boxes & refine labels
-    if (validCoco.length > 0) {
-      const cropCanvas = document.createElement("canvas");
-      const cropCtx = cropCanvas.getContext("2d", { willReadFrequently: true });
+    // 6. Refine & Anti-Hallucination Override on COCO Bounding Proposals
+    for (const pred of validCoco) {
+      const [bx, by, bw, bh] = pred.bbox;
+      let finalLabel = pred.class;
+      let finalScore = pred.score;
+      let resolved = resolveEntityInfo(finalLabel);
 
-      for (const pred of validCoco) {
-        const [bx, by, bw, bh] = pred.bbox;
-        let finalLabel = pred.class;
-        let finalScore = pred.score;
-        let resolved = resolveEntityInfo(finalLabel);
+      if (classifierModel && bw >= 20 && bh >= 20) {
+        const pad = 8;
+        const sx = Math.max(0, bx - pad);
+        const sy = Math.max(0, by - pad);
+        const sw = Math.min(img.naturalWidth - sx, bw + pad * 2);
+        const sh = Math.min(img.naturalHeight - sy, bh + pad * 2);
 
-        if (classifierModel && bw >= 20 && bh >= 20) {
-          const pad = 8;
-          const sx = Math.max(0, bx - pad);
-          const sy = Math.max(0, by - pad);
-          const sw = Math.min(img.naturalWidth - sx, bw + pad * 2);
-          const sh = Math.min(img.naturalHeight - sy, bh + pad * 2);
+        cropCanvas.width = sw;
+        cropCanvas.height = sh;
+        cropCtx.drawImage(inferenceSource, sx, sy, sw, sh, 0, 0, sw, sh);
 
-          cropCanvas.width = sw;
-          cropCanvas.height = sh;
-          cropCtx.drawImage(inferenceSource, sx, sy, sw, sh, 0, 0, sw, sh);
+        try {
+          const cropClasses = await classifierModel.classify(cropCanvas, 3);
+          if (cropClasses && cropClasses.length > 0) {
+            const topCrop = cropClasses[0];
+            const topCropInfo = resolveEntityInfo(topCrop.className);
+            const cropLower = topCrop.className.toLowerCase();
 
-          try {
-            const cropClasses = await classifierModel.classify(cropCanvas, 3);
-            if (cropClasses && cropClasses.length > 0) {
-              const topCrop = cropClasses[0];
-              const topCropInfo = resolveEntityInfo(topCrop.className);
-              const cropLower = topCrop.className.toLowerCase();
+            // Anti-Hallucination Overrides:
+            // COCO lacks 'pen', 'glasses', 'notebook', and often hallucinates toothbrush / mouse / knife
+            const isCocoHallucination = 
+              pred.class === "toothbrush" || 
+              pred.class === "knife" || 
+              pred.class === "baseball bat" || 
+              (pred.class === "scissors" && (cropLower.includes("notebook") || cropLower.includes("copy") || cropLower.includes("spiral"))) ||
+              (pred.class === "mouse" && (cropLower.includes("glasses") || cropLower.includes("sunglass")));
 
-              const isWild = cropLower.includes("lion") || cropLower.includes("tiger") || cropLower.includes("cheetah") || cropLower.includes("leopard") || cropLower.includes("bear");
-
-              if (isWild) {
-                finalLabel = topCrop.className;
-                finalScore = Math.max(finalScore, topCrop.probability);
-                resolved = topCropInfo;
-              } else if (topCropInfo.category === "Stationery / Tool" || topCropInfo.category === "Accessories") {
-                finalLabel = topCrop.className;
-                finalScore = Math.max(finalScore, topCrop.probability);
-                resolved = topCropInfo;
-              } else if (topCrop.probability > 0.40 && topCropInfo.title !== "Object") {
-                finalLabel = topCrop.className;
-                finalScore = topCrop.probability;
-                resolved = topCropInfo;
-              }
-            }
-          } catch (cropErr) {
-            console.warn("[VisionAI] Crop classification error:", cropErr);
-          }
-        }
-
-        if (fullImageClasses.length > 0) {
-          const topFull = fullImageClasses[0];
-          const topFullLower = topFull.className.toLowerCase();
-          if ((topFullLower.includes("lion") || topFullLower.includes("tiger") || topFullLower.includes("cheetah") || topFullLower.includes("leopard")) && topFull.probability > 0.25) {
-            if (resolved.category === "Animal" && !resolved.title.includes("Lion") && !resolved.title.includes("Tiger")) {
-              resolved = resolveEntityInfo(topFull.className);
-              finalScore = Math.max(finalScore, topFull.probability);
+            if (isCocoHallucination && (topCropInfo.category === "Accessories" || topCropInfo.category === "Stationery / Tool" || topCropInfo.category === "Kitchenware")) {
+              finalLabel = topCrop.className;
+              finalScore = Math.max(0.85, topCrop.probability);
+              resolved = topCropInfo;
+            } else if (topCropInfo.category === "Animal" && (cropLower.includes("lion") || cropLower.includes("tiger") || cropLower.includes("bear"))) {
+              finalLabel = topCrop.className;
+              finalScore = Math.max(finalScore, topCrop.probability);
+              resolved = topCropInfo;
+            } else if (topCropInfo.category === "Stationery / Tool" || topCropInfo.category === "Accessories" || topCropInfo.category === "Kitchenware") {
+              finalLabel = topCrop.className;
+              finalScore = Math.max(finalScore, topCrop.probability);
+              resolved = topCropInfo;
+            } else if (topCrop.probability > 0.40 && topCropInfo.title !== "Object") {
+              finalLabel = topCrop.className;
+              finalScore = topCrop.probability;
+              resolved = topCropInfo;
             }
           }
-        }
-
-        if (finalScore >= minConf) {
-          detections.push({
-            bbox: [bx, by, bw, bh],
-            info: resolved,
-            score: finalScore,
-            isNightVision: shouldEngageNightVision
-          });
+        } catch (cropErr) {
+          console.warn("[VisionAI] Crop classification error:", cropErr);
         }
       }
+
+      candidateDetections.push({
+        bbox: [bx, by, bw, bh],
+        info: resolved,
+        score: finalScore,
+        isNightVision: shouldEngageNightVision
+      });
     }
 
-    // 7. Fallback: If 0 boxes detected by COCO, utilize MobileNet full-frame classification
-    if (detections.length === 0 && fullImageClasses.length > 0) {
+    // 7. Full-Image Fallback if 0 candidates found
+    if (candidateDetections.length === 0 && fullImageClasses.length > 0) {
       const topPred = fullImageClasses[0];
       const resolved = resolveEntityInfo(topPred.className);
-
-      if (topPred.probability >= Math.min(0.10, minConf)) {
-        const insetX = img.naturalWidth * 0.12;
-        const insetY = img.naturalHeight * 0.12;
-        const w = img.naturalWidth * 0.76;
-        const h = img.naturalHeight * 0.76;
-
-        detections.push({
+      if (topPred.probability >= Math.min(0.12, minConf)) {
+        const insetX = img.naturalWidth * 0.15;
+        const insetY = img.naturalHeight * 0.15;
+        const w = img.naturalWidth * 0.70;
+        const h = img.naturalHeight * 0.70;
+        candidateDetections.push({
           bbox: [insetX, insetY, w, h],
           info: resolved,
           score: topPred.probability,
           isNightVision: shouldEngageNightVision
         });
-
-        if (fullImageClasses.length > 1 && fullImageClasses[1].probability >= 0.22) {
-          const secondPred = fullImageClasses[1];
-          const secondResolved = resolveEntityInfo(secondPred.className);
-          if (secondResolved.title !== resolved.title) {
-            detections.push({
-              bbox: [insetX + 15, insetY + 15, w - 30, h - 30],
-              info: secondResolved,
-              score: secondPred.probability,
-              isNightVision: shouldEngageNightVision
-            });
-          }
-        }
       }
     }
+
+    // 8. Apply Non-Maximum Suppression (NMS) to eliminate duplicate overlapping boxes
+    const filteredCandidates = candidateDetections.filter(d => d.score >= Math.max(0.14, minConf * 0.65));
+    let detections = applyNMS(filteredCandidates, 0.40);
 
     cachedDetections = detections;
 
@@ -829,7 +1081,76 @@ async function detectVideoLoop() {
       console.warn("Frame detection error:", err);
     }
 
-    const filtered = predictions.filter(p => p.score >= minConf);
+    let filtered = predictions.filter(p => p.score >= minConf);
+
+    // Periodic Center Everyday Tool Discovery (e.g. holding up a pen, glasses, notebook)
+    if (classifierModel && frameCount % 6 === 0 && filtered.length <= 3) {
+      try {
+        const vw = overlayCanvas.width;
+        const vh = overlayCanvas.height;
+        const cx = Math.round(vw * 0.22);
+        const cy = Math.round(vh * 0.22);
+        const cw = Math.round(vw * 0.56);
+        const ch = Math.round(vh * 0.56);
+
+        const liveCropCanvas = document.createElement("canvas");
+        liveCropCanvas.width = cw;
+        liveCropCanvas.height = ch;
+        const liveCropCtx = liveCropCanvas.getContext("2d", { willReadFrequently: true });
+        liveCropCtx.drawImage(videoSource, cx, cy, cw, ch, 0, 0, cw, ch);
+
+        classifierModel.classify(liveCropCanvas, 2).then(classes => {
+          if (classes && classes.length > 0) {
+            const top = classes[0];
+            const info = resolveEntityInfo(top.className);
+            if ((info.category === "Stationery / Tool" || info.category === "Accessories" || info.category === "Kitchenware") && top.probability >= 0.22) {
+              const liveSal = extractForegroundSaliencyBox(liveCropCanvas);
+              let liveBox = [cx, cy, cw, ch];
+              if (liveSal) {
+                liveBox = [cx + liveSal[0], cy + liveSal[1], liveSal[2], liveSal[3]];
+              }
+              window._lastLiveEverydayItem = {
+                bbox: liveBox,
+                info: info,
+                score: Math.min(0.92, top.probability * 1.3),
+                isNightVision: shouldEngageNightVision,
+                timestamp: performance.now()
+              };
+            }
+          }
+        }).catch(() => {});
+      } catch (e) {}
+    }
+
+    // Blend cached everyday item if recent (< 350ms)
+    let finalLiveEntities = [];
+    filtered.forEach(pred => {
+      let finalClass = pred.class;
+      let finalScore = pred.score;
+      let info = resolveEntityInfo(finalClass);
+
+      // Override common COCO webcam hallucinations
+      if (finalClass === "toothbrush" || finalClass === "knife") {
+        if (window._lastLiveEverydayItem && (performance.now() - window._lastLiveEverydayItem.timestamp < 350)) {
+          info = window._lastLiveEverydayItem.info;
+          finalScore = Math.max(finalScore, window._lastLiveEverydayItem.score);
+        }
+      }
+      finalLiveEntities.push({
+        bbox: pred.bbox,
+        info: info,
+        score: finalScore,
+        isNightVision: shouldEngageNightVision
+      });
+    });
+
+    if (window._lastLiveEverydayItem && (performance.now() - window._lastLiveEverydayItem.timestamp < 350)) {
+      const isAlreadyIn = finalLiveEntities.some(e => computeIoU(e.bbox, window._lastLiveEverydayItem.bbox) > 0.40);
+      if (!isAlreadyIn) {
+        finalLiveEntities.push(window._lastLiveEverydayItem);
+      }
+    }
+
     const latency = Math.round(performance.now() - tStart);
 
     frameCount++;
@@ -842,15 +1163,14 @@ async function detectVideoLoop() {
     }
 
     teleLat.textContent = `${latency} ms`;
-    teleCount.textContent = filtered.length;
+    teleCount.textContent = finalLiveEntities.length;
 
     overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
 
-    const liveEntities = filtered.map(pred => {
-      const [x, y, w, h] = pred.bbox;
-      const entityInfo = resolveEntityInfo(pred.class);
-      drawStyledDetectionBox(overlayCtx, x, y, w, h, entityInfo, pred.score, shouldEngageNightVision);
-      return { info: entityInfo, score: pred.score, isNightVision: shouldEngageNightVision };
+    const liveEntities = finalLiveEntities.map(det => {
+      const [x, y, w, h] = det.bbox;
+      drawStyledDetectionBox(overlayCtx, x, y, w, h, det.info, det.score, det.isNightVision);
+      return det;
     });
 
     updateLiveDetectionsList(liveEntities);

@@ -1,4 +1,4 @@
-﻿# Python artifacts
+# Python artifacts
 __pycache__/
 *.py[cod]
 *.class
@@ -37,6 +37,9 @@ wheels/
 # Project specific
 data/processed/*
 !data/processed/.gitkeep
+data/everyday_dataset/
+runs/
+*.pt
 models/*.pt
 models/*.onnx
 *.db
@@ -46,4 +49,3 @@ models/*.onnx
 .env
 
 cloudflared.exe
-
