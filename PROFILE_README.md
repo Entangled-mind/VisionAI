@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/Entangled-mind/VisionAI/master/assets/github_profile_banner.jpg" alt="Entangled-mind Profile Banner" width="100%" style="border-radius: 12px; margin-bottom: 1.2rem;" />
+<img src="https://raw.githubusercontent.com/Entangled-mind/VisionAI/master/assets/github_profile_banner.jpg" alt="AI & Computer Vision Portfolio Banner" width="100%" style="border-radius: 12px; margin-bottom: 1.2rem;" />
 
-# Hi there, I'm Entangled-mind 👋
+# Hi there, Welcome! 👋
 ### *AI Engineer · Computer Vision Specialist · Edge Machine Learning Architect*
 
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=700&size=20&duration=3000&pause=1000&color=38BDF8&center=true&vCenter=true&width=620&lines=Deep+Metric+Learning+%26+Face+Recognition;1%2C000-Class+Fine-Grained+Neural+Vision;Real-Time+Night+Vision+ISP+Engines;Building+High-Performance+Edge+AI+Pipelines)](https://git.io/typing-svg)

@@ -1,8 +1,7 @@
 /**
  * VisionAI — Production-Grade Dual-Model Computer Vision Engine
- * Powered by TensorFlow.js, COCO-SSD (Spatial Localization) & 
- * MobileNet-v2 (1,000-Class Fine-Grained ImageNet Classifier)
- * Featuring Real-Time Night Vision & Adaptive Low-Light Enhancement
+ * Featuring Tactile Micro-Interactions, Benchmark Suite Filter Tabs,
+ * Multi-View Switcher & In-Browser Night Vision Image Signal Processor
  */
 
 // Global Model State
@@ -21,18 +20,25 @@ let lastFrameTime = performance.now();
 let frameCount = 0;
 let fps = 0;
 
-// Night Vision & Low-Light Enhancement State
+// Night Vision & Multi-View Rendering Cache
 let liveNightVisionMode = "auto";   // "auto", "on", "off"
 let staticNightVisionMode = "auto"; // "auto", "on", "off"
 let staticNightGain = 3.0;          // Exposure gain multiplier (1.0x to 5.0x)
 let staticNightGamma = 0.40;        // Shadow expansion exponent (0.35 to 0.50)
 let currentLoadedImageSrc = null;
+let currentViewMode = "augmented";   // "augmented", "illuminated", "raw"
+
+// Cached Frames for Instant Switching
+let cachedRawImg = null;
+let cachedEnhancedCanvas = null;
+let cachedDetections = [];
 
 // DOM Elements - Camera
 const videoEl = document.getElementById("webcam");
 const overlayCanvas = document.getElementById("overlay-canvas");
 const overlayCtx = overlayCanvas ? overlayCanvas.getContext("2d") : null;
 const placeholderOverlay = document.getElementById("camera-placeholder");
+const shutterFlash = document.getElementById("shutter-flash");
 const btnToggleCamera = document.getElementById("btn-toggle-camera");
 const btnStartCameraHero = document.getElementById("btn-start-camera-hero");
 const btnFlipCamera = document.getElementById("btn-flip-camera");
@@ -53,6 +59,7 @@ const dropzone = document.getElementById("dropzone");
 const staticCanvas = document.getElementById("static-canvas");
 const staticCtx = staticCanvas ? staticCanvas.getContext("2d") : null;
 const staticPlaceholder = document.getElementById("static-placeholder");
+const scanlineLaser = document.getElementById("scanline-laser");
 const staticConfSlider = document.getElementById("static-conf-slider");
 const staticConfVal = document.getElementById("static-conf-val");
 const staticNightModeSelect = document.getElementById("static-night-mode");
@@ -66,7 +73,36 @@ const staticAnimals = document.getElementById("static-animals");
 const staticObjects = document.getElementById("static-objects");
 const inspectorTableContainer = document.getElementById("inspector-table-container");
 const inspectorTableBody = document.getElementById("inspector-table-body");
+const btnCopyDetections = document.getElementById("btn-copy-detections");
 const sampleChips = document.querySelectorAll(".chip-btn");
+const benchmarkTabs = document.querySelectorAll("#benchmark-tabs .tab-btn");
+const viewModeBar = document.getElementById("view-mode-bar");
+const btnViewAugmented = document.getElementById("btn-view-augmented");
+const btnViewIlluminated = document.getElementById("btn-view-illuminated");
+const btnViewRaw = document.getElementById("btn-view-raw");
+
+// ---------------------------------------------------------------------------
+// 0. Interactive Toast Notification System
+// ---------------------------------------------------------------------------
+function showToast(message, icon = "⚡") {
+  const container = document.getElementById("toast-container");
+  if (!container) return;
+
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.innerHTML = `
+    <span style="font-size: 1.15rem; display: flex; align-items: center;">${icon}</span>
+    <span>${message}</span>
+  `;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add("toast-exit");
+    setTimeout(() => {
+      if (toast.parentNode) toast.remove();
+    }, 250);
+  }, 2700);
+}
 
 // ---------------------------------------------------------------------------
 // 1. Comprehensive Taxonomy & Entity Resolution Engine
@@ -237,9 +273,6 @@ function resolveEntityInfo(rawLabel) {
 // ---------------------------------------------------------------------------
 // 2. Night Vision & Low-Light Enhancement Subsystem
 // ---------------------------------------------------------------------------
-/**
- * Rapidly measures scene ambient luminance (0% pitch dark to 100% full daylight)
- */
 function measureLuminance(canvasOrImg) {
   const sampleSize = 48;
   const offCanvas = document.createElement("canvas");
@@ -262,10 +295,6 @@ function measureLuminance(canvasOrImg) {
   return Math.max(1, Math.round((avgLuma / 255.0) * 100));
 }
 
-/**
- * High-speed hardware-friendly Retinex / Gamma Tone Mapping Look-Up Table (LUT).
- * Recovers crushed gradients and edges from shadows in < 8ms.
- */
 function createLowLightEnhancedCanvas(source, gain = 3.0, gamma = 0.40) {
   const w = source.naturalWidth || source.videoWidth || source.width || 640;
   const h = source.naturalHeight || source.videoHeight || source.height || 480;
@@ -279,7 +308,6 @@ function createLowLightEnhancedCanvas(source, gain = 3.0, gamma = 0.40) {
   const imgData = offCtx.getImageData(0, 0, w, h);
   const d = imgData.data;
   
-  // Precompute 256-entry Look-Up Table
   const lut = new Uint8Array(256);
   for (let v = 0; v < 256; v++) {
     const normalized = v / 255.0;
@@ -288,9 +316,9 @@ function createLowLightEnhancedCanvas(source, gain = 3.0, gamma = 0.40) {
   }
   
   for (let i = 0; i < d.length; i += 4) {
-    d[i] = lut[d[i]];       // R
-    d[i+1] = lut[d[i+1]];   // G
-    d[i+2] = lut[d[i+2]];   // B
+    d[i] = lut[d[i]];
+    d[i+1] = lut[d[i+1]];
+    d[i+2] = lut[d[i+2]];
   }
   
   offCtx.putImageData(imgData, 0, 0);
@@ -328,9 +356,9 @@ async function initModel() {
 
     if (modelStatusEl) {
       modelStatusEl.className = "status-indicator ready";
-      modelStatusEl.innerHTML = '<span class="status-dot"></span><span class="status-text">AI Ready: COCO + ImageNet (1k Classes) + Night Vision</span>';
+      modelStatusEl.innerHTML = '<span class="status-dot"></span><span class="status-text">AI Ready: Dual Neural Pipeline Active</span>';
     }
-    console.log("[VisionAI] Dual AI Models & Night Vision Engine ready!");
+    showToast("AI Models Loaded: COCO-SSD + MobileNet 1k", "🚀");
   } catch (err) {
     console.warn("[VisionAI] WebGL init fallback, loading CPU backend...", err);
     try {
@@ -364,16 +392,16 @@ function drawStyledDetectionBox(ctx, x, y, w, h, entityInfo, score, isNightVisio
   const nvTag = isNightVision ? " 🌙" : "";
   const badgeText = `${icon} ${entityInfo.title} [${confText}]${nvTag}`;
 
-  // Draw semi-transparent bounding fill
+  // Semi-transparent bounding fill
   ctx.fillStyle = entityInfo.fill;
   ctx.fillRect(x, y, w, h);
 
-  // Draw crisp high-tech border
+  // Crisp high-tech border
   ctx.lineWidth = 2.5;
   ctx.strokeStyle = isNightVision ? "#38bdf8" : entityInfo.stroke;
   ctx.strokeRect(x, y, w, h);
 
-  // Draw corner accents
+  // Corner accents
   const cornerLen = Math.min(16, Math.min(w, h) / 3);
   ctx.lineWidth = 4;
   ctx.strokeStyle = isNightVision ? "#38bdf8" : "#ffffff";
@@ -392,14 +420,13 @@ function drawStyledDetectionBox(ctx, x, y, w, h, entityInfo, score, isNightVisio
   ctx.lineTo(x + w - cornerLen, y + h);
   ctx.stroke();
 
-  // Draw pill label badge
+  // Pill label badge
   ctx.font = "bold 13px 'JetBrains Mono', monospace";
   const textWidth = ctx.measureText(badgeText).width;
   const badgeH = 24;
   const badgeW = textWidth + 16;
   const badgeY = Math.max(0, y - badgeH - 3);
 
-  // Badge background
   ctx.fillStyle = isNightVision ? "#0369a1" : entityInfo.badge;
   ctx.beginPath();
   if (ctx.roundRect) {
@@ -409,13 +436,47 @@ function drawStyledDetectionBox(ctx, x, y, w, h, entityInfo, score, isNightVisio
   }
   ctx.fill();
 
-  // Badge text
   ctx.fillStyle = "#ffffff";
   ctx.fillText(badgeText, x + 8, badgeY + 17);
 }
 
 // ---------------------------------------------------------------------------
-// 5. Static Image Inspector with Night Vision & Dual-Model Synergy
+// 5. Multi-View Rendering Engine
+// ---------------------------------------------------------------------------
+function renderCanvasView() {
+  if (!cachedRawImg || !staticCanvas || !staticCtx) return;
+
+  staticCanvas.width = cachedRawImg.naturalWidth;
+  staticCanvas.height = cachedRawImg.naturalHeight;
+
+  if (currentViewMode === "raw") {
+    // Pure original untouched image
+    staticCtx.drawImage(cachedRawImg, 0, 0);
+  } else if (currentViewMode === "illuminated") {
+    // Night Vision sensor matrix view
+    if (cachedEnhancedCanvas) {
+      staticCtx.drawImage(cachedEnhancedCanvas, 0, 0);
+    } else {
+      staticCtx.drawImage(cachedRawImg, 0, 0);
+    }
+  } else {
+    // Augmented AI View (Default): Image + Bounding Boxes & Badges
+    const shouldDrawIlluminated = cachedEnhancedCanvas && (cachedDetections.some(d => d.isNightVision));
+    if (shouldDrawIlluminated) {
+      staticCtx.drawImage(cachedEnhancedCanvas, 0, 0);
+    } else {
+      staticCtx.drawImage(cachedRawImg, 0, 0);
+    }
+
+    cachedDetections.forEach(det => {
+      const [x, y, w, h] = det.bbox;
+      drawStyledDetectionBox(staticCtx, x, y, w, h, det.info, det.score, det.isNightVision);
+    });
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 6. Static Image Inspector with Dual-Model Synergy & Night Vision
 // ---------------------------------------------------------------------------
 async function analyzeStaticImage(imgSrc, imageName = "Image") {
   if (!isModelsReady || (!cocoModel && !classifierModel)) {
@@ -425,15 +486,18 @@ async function analyzeStaticImage(imgSrc, imageName = "Image") {
 
   currentLoadedImageSrc = imgSrc;
 
+  // Show placeholder with futuristic laser scanline
   staticPlaceholder.style.display = "flex";
-  staticPlaceholder.querySelector("h3").textContent = "Analyzing Image...";
-  staticPlaceholder.querySelector("p").textContent = "Running dual neural networks (COCO Localization + ImageNet-1k Fine-Grained Classifier)...";
+  staticPlaceholder.querySelector("h3").textContent = "Neural Scanning Active...";
+  staticPlaceholder.querySelector("p").textContent = "Running Dual Neural Pipeline (Spatial Proposal + 1,000-Class ImageNet Filter)...";
+  if (scanlineLaser) scanlineLaser.style.display = "block";
 
   const img = new Image();
   img.crossOrigin = "anonymous";
   img.src = imgSrc;
 
   img.onload = async () => {
+    cachedRawImg = img;
     staticCanvas.width = img.naturalWidth;
     staticCanvas.height = img.naturalHeight;
 
@@ -445,24 +509,19 @@ async function analyzeStaticImage(imgSrc, imageName = "Image") {
       (staticNightVisionMode === "on") || 
       (staticNightVisionMode === "auto" && ambientLux < 25);
 
-    // 3. Prepare inference tensor source (boosted or original)
+    // 3. Prepare inference tensor source
     let inferenceSource = img;
     if (shouldEngageNightVision) {
-      inferenceSource = createLowLightEnhancedCanvas(img, staticNightGain, staticNightGamma);
-    }
-
-    // Draw base image onto display canvas
-    // If night vision is engaged, render the illuminated preview so user can inspect details
-    if (shouldEngageNightVision) {
-      staticCtx.drawImage(inferenceSource, 0, 0);
+      cachedEnhancedCanvas = createLowLightEnhancedCanvas(img, staticNightGain, staticNightGamma);
+      inferenceSource = cachedEnhancedCanvas;
     } else {
-      staticCtx.drawImage(img, 0, 0);
+      cachedEnhancedCanvas = null;
     }
 
     const minConf = parseFloat(staticConfSlider.value) / 100;
     let detections = [];
 
-    // 4. Run COCO-SSD for candidate spatial boxes on the inference source
+    // 4. Run COCO-SSD for candidate spatial boxes
     let cocoPredictions = [];
     try {
       if (cocoModel) {
@@ -472,10 +531,9 @@ async function analyzeStaticImage(imgSrc, imageName = "Image") {
       console.warn("[VisionAI] COCO detection error:", err);
     }
 
-    // Filter COCO detections by threshold
     const validCoco = cocoPredictions.filter(p => p.score >= Math.max(0.12, minConf * 0.65));
 
-    // 5. Classify full image with MobileNet for fine-grained recognition
+    // 5. Classify full image with MobileNet
     let fullImageClasses = [];
     try {
       if (classifierModel) {
@@ -484,8 +542,6 @@ async function analyzeStaticImage(imgSrc, imageName = "Image") {
     } catch (err) {
       console.warn("[VisionAI] Full-frame classification error:", err);
     }
-
-    console.log(`[VisionAI] Ambient: ${ambientLux}% Lux | Night Vision: ${shouldEngageNightVision} | Top Classes:`, fullImageClasses);
 
     // 6. Process candidate bounding boxes & refine labels
     if (validCoco.length > 0) {
@@ -537,7 +593,6 @@ async function analyzeStaticImage(imgSrc, imageName = "Image") {
           }
         }
 
-        // Full-frame wild animal override
         if (fullImageClasses.length > 0) {
           const topFull = fullImageClasses[0];
           const topFullLower = topFull.className.toLowerCase();
@@ -593,25 +648,17 @@ async function analyzeStaticImage(imgSrc, imageName = "Image") {
       }
     }
 
-    // Redraw base image with bounding boxes
-    if (shouldEngageNightVision) {
-      staticCtx.drawImage(inferenceSource, 0, 0);
-    } else {
-      staticCtx.drawImage(img, 0, 0);
-    }
+    cachedDetections = detections;
 
-    let animalCount = 0;
-    let toolAndObjectCount = 0;
+    // Render Canvas according to current view mode
+    renderCanvasView();
 
-    detections.forEach(det => {
-      const [x, y, w, h] = det.bbox;
-      if (det.info.category === "Animal") animalCount++;
-      else toolAndObjectCount++;
-      drawStyledDetectionBox(staticCtx, x, y, w, h, det.info, det.score, det.isNightVision);
-    });
+    // Turn off scanline and placeholder
+    if (scanlineLaser) scanlineLaser.style.display = "none";
+    staticPlaceholder.style.display = "none";
+    if (viewModeBar) viewModeBar.style.display = "flex";
 
     // Update Telemetry Bar
-    staticPlaceholder.style.display = "none";
     staticTelemetry.style.display = "grid";
     staticRes.textContent = `${img.naturalWidth} × ${img.naturalHeight}`;
     
@@ -625,6 +672,13 @@ async function analyzeStaticImage(imgSrc, imageName = "Image") {
         ? `<span style="color: #38bdf8; font-weight: 700;">🌙 ACTIVE (${staticNightGain.toFixed(1)}x)</span>`
         : `<span style="color: var(--text-muted);">Inactive</span>`;
     }
+
+    let animalCount = 0;
+    let toolAndObjectCount = 0;
+    detections.forEach(det => {
+      if (det.info.category === "Animal") animalCount++;
+      else toolAndObjectCount++;
+    });
 
     staticAnimals.textContent = animalCount;
     staticObjects.textContent = toolAndObjectCount;
@@ -654,11 +708,14 @@ async function analyzeStaticImage(imgSrc, imageName = "Image") {
           </tr>
         `;
       }).join("");
+
+      showToast(`Detected: ${detections.map(d => d.info.title).join(", ")}`, "🎯");
     }
   };
 
   img.onerror = (e) => {
     alert("Failed to load image: " + imgSrc);
+    if (scanlineLaser) scanlineLaser.style.display = "none";
     staticPlaceholder.style.display = "flex";
     staticPlaceholder.querySelector("h3").textContent = "Image Load Error";
     staticPlaceholder.querySelector("p").textContent = "Could not decode or download image source.";
@@ -666,7 +723,7 @@ async function analyzeStaticImage(imgSrc, imageName = "Image") {
 }
 
 // ---------------------------------------------------------------------------
-// 6. Camera Controls & Real-Time Video Loop
+// 7. Camera Controls & Real-Time Video Loop
 // ---------------------------------------------------------------------------
 async function startCamera() {
   if (!isModelsReady) {
@@ -706,6 +763,7 @@ async function startCamera() {
       lastFrameTime = performance.now();
       frameCount = 0;
       detectVideoLoop();
+      showToast("Live Camera Feed Active", "📷");
     };
   } catch (err) {
     console.error("Camera access error:", err);
@@ -738,6 +796,7 @@ function stopCamera() {
   teleCount.textContent = "0";
   if (teleLum) teleLum.textContent = "--%";
   liveDetectionsList.innerHTML = '<div class="empty-state">Camera is stopped.</div>';
+  showToast("Live Camera Stopped", "⏹");
 }
 
 async function detectVideoLoop() {
@@ -746,7 +805,6 @@ async function detectVideoLoop() {
   const tStart = performance.now();
 
   if (videoEl.readyState >= 2 && cocoModel) {
-    // 1. Periodic ambient light measurement (every 10 frames)
     let ambientLux = 50;
     if (frameCount % 10 === 0) {
       ambientLux = measureLuminance(videoEl);
@@ -774,7 +832,6 @@ async function detectVideoLoop() {
     const filtered = predictions.filter(p => p.score >= minConf);
     const latency = Math.round(performance.now() - tStart);
 
-    // Calculate FPS
     frameCount++;
     const now = performance.now();
     if (now - lastFrameTime >= 500) {
@@ -821,7 +878,7 @@ function updateLiveDetectionsList(entities) {
 }
 
 // ---------------------------------------------------------------------------
-// 7. Event Listeners & Binding
+// 8. Event Listeners & Tactile Micro-Interactions
 // ---------------------------------------------------------------------------
 if (btnToggleCamera) {
   btnToggleCamera.addEventListener("click", () => {
@@ -840,6 +897,7 @@ if (btnStartCameraHero) {
 if (btnFlipCamera) {
   btnFlipCamera.addEventListener("click", () => {
     currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
+    showToast(`Switched to ${currentFacingMode} camera`, "🔄");
     if (isCameraRunning) {
       stopCamera();
       startCamera();
@@ -854,16 +912,19 @@ if (btnNightVisionLive) {
       btnNightVisionLive.textContent = "🌙 Night Vision: ON";
       btnNightVisionLive.style.borderColor = "#38bdf8";
       btnNightVisionLive.style.color = "#38bdf8";
+      showToast("Live Night Vision: Always ON", "🌙");
     } else if (liveNightVisionMode === "on") {
       liveNightVisionMode = "off";
       btnNightVisionLive.textContent = "🌙 Night Vision: OFF";
       btnNightVisionLive.style.borderColor = "rgba(99, 102, 241, 0.4)";
       btnNightVisionLive.style.color = "#a5b4fc";
+      showToast("Live Night Vision: OFF", "⚪");
     } else {
       liveNightVisionMode = "auto";
       btnNightVisionLive.textContent = "🌙 Night Vision: AUTO";
       btnNightVisionLive.style.borderColor = "rgba(99, 102, 241, 0.4)";
       btnNightVisionLive.style.color = "#a5b4fc";
+      showToast("Live Night Vision: AUTO Mode", "✨");
     }
   });
 }
@@ -871,6 +932,14 @@ if (btnNightVisionLive) {
 if (btnSnapshot) {
   btnSnapshot.addEventListener("click", () => {
     if (!isCameraRunning) return;
+
+    // Trigger Camera Shutter Flash animation
+    if (shutterFlash) {
+      shutterFlash.classList.remove("flash-active");
+      void shutterFlash.offsetWidth; // Trigger reflow
+      shutterFlash.classList.add("flash-active");
+    }
+
     const snapCanvas = document.createElement("canvas");
     snapCanvas.width = videoEl.videoWidth;
     snapCanvas.height = videoEl.videoHeight;
@@ -878,8 +947,13 @@ if (btnSnapshot) {
     ctx.drawImage(videoEl, 0, 0);
     const dataUrl = snapCanvas.toDataURL("image/jpeg", 0.95);
     
-    document.getElementById("image-inspector").scrollIntoView({ behavior: "smooth" });
-    analyzeStaticImage(dataUrl, "Camera Snapshot");
+    showToast("📸 Snapshot Captured! Analyzing...", "✨");
+
+    // Scroll to inspector & analyze
+    setTimeout(() => {
+      document.getElementById("image-inspector").scrollIntoView({ behavior: "smooth" });
+      analyzeStaticImage(dataUrl, "Camera Snapshot");
+    }, 150);
   });
 }
 
@@ -901,6 +975,7 @@ if (staticConfSlider) {
 if (staticNightModeSelect) {
   staticNightModeSelect.addEventListener("change", (e) => {
     staticNightVisionMode = e.target.value;
+    showToast(`Night Vision Mode: ${e.target.value.toUpperCase()}`, "🌙");
     if (currentLoadedImageSrc) {
       analyzeStaticImage(currentLoadedImageSrc);
     }
@@ -917,13 +992,65 @@ if (staticNightGainSlider) {
   });
 }
 
+// Display View Mode Switcher Listeners
+if (btnViewAugmented) {
+  btnViewAugmented.addEventListener("click", () => {
+    currentViewMode = "augmented";
+    [btnViewAugmented, btnViewIlluminated, btnViewRaw].forEach(b => b && b.classList.remove("active"));
+    btnViewAugmented.classList.add("active");
+    renderCanvasView();
+    showToast("Display: Augmented AI View", "👁️");
+  });
+}
+
+if (btnViewIlluminated) {
+  btnViewIlluminated.addEventListener("click", () => {
+    currentViewMode = "illuminated";
+    [btnViewAugmented, btnViewIlluminated, btnViewRaw].forEach(b => b && b.classList.remove("active"));
+    btnViewIlluminated.classList.add("active");
+    renderCanvasView();
+    showToast("Display: Night Sensor Tensor Matrix", "🌙");
+  });
+}
+
+if (btnViewRaw) {
+  btnViewRaw.addEventListener("click", () => {
+    currentViewMode = "raw";
+    [btnViewAugmented, btnViewIlluminated, btnViewRaw].forEach(b => b && b.classList.remove("active"));
+    btnViewRaw.classList.add("active");
+    renderCanvasView();
+    showToast("Display: Raw Untouched Source", "🖼️");
+  });
+}
+
+// Category Filter Tabs Handling
+benchmarkTabs.forEach(tab => {
+  tab.addEventListener("click", () => {
+    benchmarkTabs.forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    const filter = tab.getAttribute("data-filter");
+
+    sampleChips.forEach(chip => {
+      const cat = chip.getAttribute("data-category");
+      if (filter === "all" || cat === filter) {
+        chip.style.display = "inline-flex";
+      } else {
+        chip.style.display = "none";
+      }
+    });
+    showToast(`Filtered: ${tab.textContent}`, "⚡");
+  });
+});
+
 // File Upload Handler
 if (fileInput) {
   fileInput.addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (file) {
+      sampleChips.forEach(c => c.classList.remove("active"));
       const reader = new FileReader();
       reader.onload = (event) => {
+        showToast(`Loaded ${file.name}`, "📁");
         analyzeStaticImage(event.target.result, file.name);
       };
       reader.readAsDataURL(file);
@@ -947,8 +1074,10 @@ if (dropzone) {
     dropzone.classList.remove("dragover");
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith("image/")) {
+      sampleChips.forEach(c => c.classList.remove("active"));
       const reader = new FileReader();
       reader.onload = (event) => {
+        showToast(`Dropped ${file.name}`, "📁");
         analyzeStaticImage(event.target.result, file.name);
       };
       reader.readAsDataURL(file);
@@ -956,15 +1085,41 @@ if (dropzone) {
   });
 }
 
-// Benchmark Sample Chips
+// Benchmark Sample Chips with Active State & Toast
 sampleChips.forEach(chip => {
   chip.addEventListener("click", () => {
+    sampleChips.forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
     const samplePath = chip.getAttribute("data-sample");
+    const sampleName = chip.textContent.trim();
     if (samplePath) {
+      showToast(`Analyzing ${sampleName}...`, "🔍");
       analyzeStaticImage(samplePath, samplePath.split("/").pop());
     }
   });
 });
+
+// Copy Results JSON
+if (btnCopyDetections) {
+  btnCopyDetections.addEventListener("click", () => {
+    if (!cachedDetections || cachedDetections.length === 0) {
+      showToast("No detections to copy!", "⚠️");
+      return;
+    }
+    const cleanData = cachedDetections.map(d => ({
+      label: d.info.title,
+      category: d.info.category,
+      confidence: `${(d.score * 100).toFixed(1)}%`,
+      bbox: d.bbox.map(Math.round),
+      nightVisionBoosted: d.isNightVision
+    }));
+    navigator.clipboard.writeText(JSON.stringify(cleanData, null, 2)).then(() => {
+      showToast("Detections JSON copied to clipboard!", "📋");
+    }).catch(err => {
+      showToast("Failed to copy to clipboard", "❌");
+    });
+  });
+}
 
 // Initialize on DOM load
 window.addEventListener("DOMContentLoaded", () => {
