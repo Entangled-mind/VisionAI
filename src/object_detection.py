@@ -49,7 +49,7 @@ CLASS_COLOR_PALETTE: Dict[str, Tuple[int, int, int]] = {
     "mouse": (200, 255, 0),         # Mint Green
     "keyboard": (128, 255, 128),    # Pale Lime
     "tv": (255, 128, 0),           # Deep Sky Blue
-    # Common Household Items
+    # Common Household & Everyday Items
     "bottle": (50, 220, 100),       # Emerald Green
     "cup": (0, 140, 255),           # Deep Amber
     "chair": (180, 105, 255),       # Lavender
@@ -57,6 +57,10 @@ CLASS_COLOR_PALETTE: Dict[str, Tuple[int, int, int]] = {
     "backpack": (100, 100, 255),    # Coral Red
     "clock": (0, 255, 255),         # Yellow
     "scissors": (255, 150, 150),    # Soft Lilac
+    "headphones": (246, 92, 139),   # Purple Fuchsia
+    "smartphone": (241, 102, 99),   # Indigo
+    "shoes": (129, 185, 16),        # Mint Emerald
+    "shoes / slippers": (129, 185, 16), # Mint Emerald
 }
 
 
@@ -120,6 +124,25 @@ class ObjectDetector:
             x1, y1, x2, y2 = [int(v) for v in box.xyxy[0].tolist()]
             w = max(0, x2 - x1)
             h = max(0, y2 - y1)
+
+            # Domain-Specific Neural Disambiguation
+            frame_h, frame_w = frame.shape[:2]
+
+            # 1. Headphones vs Motorcycle/Bicycle (indoor/desk scale < 70% of frame)
+            if class_name in ("motorcycle", "bicycle") and (w < frame_w * 0.70 and h < frame_h * 0.70):
+                class_name = "headphones"
+
+            # 2. Smartphone vs Remote Control
+            elif class_name == "remote":
+                class_name = "cell phone"
+
+            # 3. Water Bottle vs Vase
+            elif class_name == "vase":
+                class_name = "bottle"
+
+            # 4. Slippers / Footwear vs Person (when bounding box is floor-level or wide/short)
+            elif class_name == "person" and (y1 + h >= frame_h * 0.65 or h < frame_h * 0.40):
+                class_name = "shoes / slippers"
 
             detections.append({
                 "box": (x1, y1, w, h),

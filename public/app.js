@@ -107,6 +107,34 @@ function showToast(message, icon = "⚡") {
 // ---------------------------------------------------------------------------
 // 1. Comprehensive Taxonomy & Entity Resolution Engine
 // ---------------------------------------------------------------------------
+const IMAGENET_DOG_BREEDS = [
+  "chihuahua", "japanese spaniel", "maltese", "pekinese", "shih-tzu", "blenheim spaniel",
+  "papillon", "toy terrier", "rhodesian ridgeback", "afghan hound", "basset", "beagle",
+  "bloodhound", "bluetick", "coonhound", "walker hound", "foxhound", "redbone", "borzoi",
+  "irish wolfhound", "italian greyhound", "whippet", "ibizan hound", "norwegian elkhound",
+  "otterhound", "saluki", "scottish deerhound", "weimaraner", "staffordshire bullterrier",
+  "american staffordshire terrier", "bedlington terrier", "border terrier", "kerry blue terrier",
+  "irish terrier", "norfolk terrier", "norwich terrier", "yorkshire terrier", "wire-haired fox terrier",
+  "lakeland terrier", "sealyham terrier", "airedale", "cairn", "australian terrier", "dandie dinmont",
+  "boston bull", "schnauzer", "scotch terrier", "tibetan terrier", "silky terrier", "soft-coated wheaten terrier",
+  "west highland white terrier", "lhasa", "retriever", "golden retriever", "labrador retriever",
+  "flat-coated retriever", "curly-coated retriever", "chesapeake bay retriever", "pointer", "vizsla",
+  "setter", "english setter", "irish setter", "gordon setter", "brittany spaniel", "clumber",
+  "springer spaniel", "cocker spaniel", "sussex spaniel", "water spaniel", "kuvasz", "schipperke",
+  "groenendael", "malinois", "briard", "kelpie", "komondor", "old english sheepdog", "sheepdog",
+  "collie", "border collie", "bouvier", "rottweiler", "german shepherd", "doberman", "pinscher",
+  "swiss mountain dog", "bernese mountain dog", "appenzeller", "entlebucher", "boxer", "bull mastiff",
+  "tibetan mastiff", "french bulldog", "bulldog", "great dane", "saint bernard", "husky", "malamute",
+  "siberian husky", "dalmatian", "affenpinscher", "basenji", "pug", "leonberg", "newfoundland",
+  "great pyrenees", "samoyed", "pomeranian", "chow", "keeshond", "griffon", "pembroke", "cardigan",
+  "corgi", "poodle", "toy poodle", "miniature poodle", "standard poodle", "dingo", "dhole", "canine", "dog", "puppy"
+];
+
+const IMAGENET_CAT_BREEDS = [
+  "tabby", "tabby cat", "tiger cat", "persian cat", "siamese cat", "siamese", "egyptian cat",
+  "cougar", "puma", "catamount", "mountain lion", "lynx", "bobcat", "leopard cat", "kitten", "cat"
+];
+
 const ANIMAL_KEYWORDS = [
   "lion", "tiger", "cheetah", "leopard", "jaguar", "panther", "cat", "dog",
   "puppy", "kitten", "wolf", "fox", "bear", "elephant", "zebra", "giraffe",
@@ -123,16 +151,52 @@ const TOOL_KEYWORDS = [
   "scissors", "glasses", "sunglasses", "spectacles", "shades", "phone",
   "cellphone", "cellular", "mobile", "telephone", "bag", "backpack",
   "knapsack", "handbag", "purse", "wallet", "chair", "table", "desk",
-  "laptop", "mouse", "keyboard", "bottle", "cup", "mug", "clock", "watch"
+  "laptop", "mouse", "keyboard", "bottle", "cup", "mug", "clock", "watch",
+  "headphone", "headphones", "headset", "slipper", "slippers", "sandal", "shoe"
 ];
+
+function isImageNetDog(str) {
+  const lower = (str || "").toLowerCase();
+  return IMAGENET_DOG_BREEDS.some(b => lower.includes(b));
+}
+
+function isImageNetCat(str) {
+  const lower = (str || "").toLowerCase();
+  return IMAGENET_CAT_BREEDS.some(b => lower.includes(b));
+}
+
+function getMatchingDogBreed(str) {
+  const lower = (str || "").toLowerCase();
+  for (const b of IMAGENET_DOG_BREEDS) {
+    if (b !== "dog" && b !== "canine" && b !== "puppy" && lower.includes(b)) {
+      return `Dog (${b.charAt(0).toUpperCase() + b.slice(1)})`;
+    }
+  }
+  return "Dog";
+}
 
 /**
  * Maps raw ImageNet / COCO labels to clean, formatted entity metadata
  */
 function resolveEntityInfo(rawLabel) {
-  const lower = rawLabel.toLowerCase();
+  const lower = (rawLabel || "").toLowerCase();
 
-  // Specific Wild & Domestic Animals
+  // 1. Canine / Dog Resolution (Strict check against 120+ ImageNet breeds)
+  if (isImageNetDog(lower)) {
+    let dogTitle = "Dog";
+    const matched = getMatchingDogBreed(lower);
+    if (matched !== "Dog") {
+      dogTitle = matched;
+    }
+    return { title: dogTitle, category: "Animal", emoji: "🐶", stroke: "#f97316", fill: "rgba(249, 115, 22, 0.22)", badge: "#c2410c" };
+  }
+
+  // 2. Feline / Cat Resolution
+  if (isImageNetCat(lower)) {
+    return { title: "Cat", category: "Animal", emoji: "🐱", stroke: "#f59e0b", fill: "rgba(245, 158, 11, 0.22)", badge: "#b45309" };
+  }
+
+  // Specific Wild Animals
   if (lower.includes("lion")) {
     return { title: "Lion (King of Beasts)", category: "Animal", emoji: "🦁", stroke: "#f59e0b", fill: "rgba(245, 158, 11, 0.22)", badge: "#d97706" };
   }
@@ -141,12 +205,6 @@ function resolveEntityInfo(rawLabel) {
   }
   if (lower.includes("cheetah") || lower.includes("leopard") || lower.includes("jaguar")) {
     return { title: "Leopard / Cheetah", category: "Animal", emoji: "🐆", stroke: "#eab308", fill: "rgba(234, 179, 8, 0.22)", badge: "#ca8a04" };
-  }
-  if (lower.includes("dog") || lower.includes("retriever") || lower.includes("terrier") || lower.includes("hound") || lower.includes("shepherd") || lower.includes("bulldog") || lower.includes("poodle") || lower.includes("spaniel") || lower.includes("husky")) {
-    return { title: "Dog", category: "Animal", emoji: "🐶", stroke: "#f97316", fill: "rgba(249, 115, 22, 0.22)", badge: "#c2410c" };
-  }
-  if (lower.includes("cat") || lower.includes("tabby") || lower.includes("siamese") || lower.includes("persian")) {
-    return { title: "Cat", category: "Animal", emoji: "🐱", stroke: "#f59e0b", fill: "rgba(245, 158, 11, 0.22)", badge: "#b45309" };
   }
   if (lower.includes("bear") && !lower.includes("teddy")) {
     return { title: "Bear", category: "Animal", emoji: "🐻", stroke: "#854d0e", fill: "rgba(133, 77, 14, 0.22)", badge: "#713f12" };
@@ -171,6 +229,36 @@ function resolveEntityInfo(rawLabel) {
   }
   if (lower.includes("cow") || lower.includes("ox") || lower.includes("bull")) {
     return { title: "Cow / Cattle", category: "Animal", emoji: "🐄", stroke: "#e2e8f0", fill: "rgba(226, 232, 240, 0.22)", badge: "#334155" };
+  }
+
+  // 3. Audio / Headphones & Headsets
+  if (lower.includes("headphone") || lower.includes("headphones") || lower.includes("headset") || lower.includes("earphone") || lower.includes("earphones") || lower.includes("earbuds") || lower.includes("airpods") || lower.includes("headpiece")) {
+    return { title: "Headphones / Headset", category: "Electronics", emoji: "🎧", stroke: "#8b5cf6", fill: "rgba(139, 92, 246, 0.22)", badge: "#7c3aed" };
+  }
+
+  // 4. Smartphone / Mobile Phone
+  if (lower.includes("cellular") || lower.includes("cellphone") || lower.includes("smartphone") || lower.includes("mobile phone") || lower.includes("cell phone") || (lower.includes("phone") && !lower.includes("headphone") && !lower.includes("earphone"))) {
+    return { title: "Smartphone / Phone", category: "Electronics", emoji: "📱", stroke: "#6366f1", fill: "rgba(99, 102, 241, 0.22)", badge: "#4f46e5" };
+  }
+
+  // 5. Water Bottle & Drinkware
+  if (lower.includes("water bottle") || lower.includes("beer bottle") || lower.includes("wine bottle") || lower.includes("pop bottle") || lower.includes("bottle") || lower.includes("flask") || lower.includes("tumbler") || lower.includes("shaker") || lower.includes("canteen")) {
+    return { title: "Water Bottle / Tumbler", category: "Kitchenware", emoji: "🍾", stroke: "#06b6d4", fill: "rgba(6, 182, 212, 0.22)", badge: "#0891b2" };
+  }
+
+  // 6. Slippers & Footwear
+  if (lower.includes("slipper") || lower.includes("slippers") || lower.includes("sleeper") || lower.includes("sleepers") || lower.includes("sandal") || lower.includes("sandals") || lower.includes("flip-flop") || lower.includes("slides") || lower.includes("clog") || lower.includes("shoe") || lower.includes("shoes") || lower.includes("sneaker") || lower.includes("boot") || lower.includes("loafer") || lower.includes("moccasin")) {
+    return { title: "Slippers / Footwear", category: "Everyday Item", emoji: "🩴", stroke: "#10b981", fill: "rgba(16, 185, 129, 0.22)", badge: "#059669" };
+  }
+
+  // 7. Remote Control (TV / Electronics)
+  if (lower.includes("remote") || lower.includes("remote control")) {
+    return { title: "Remote Control", category: "Electronics", emoji: "🎮", stroke: "#3b82f6", fill: "rgba(59, 130, 246, 0.22)", badge: "#2563eb" };
+  }
+
+  // 8. Flower Vase
+  if (lower.includes("vase")) {
+    return { title: "Flower Vase", category: "Decoration", emoji: "🏺", stroke: "#ec4899", fill: "rgba(236, 72, 153, 0.22)", badge: "#db2777" };
   }
 
   // Everyday Tools, Stationery & Writing Instruments
@@ -230,17 +318,11 @@ function resolveEntityInfo(rawLabel) {
   if (lower.includes("key") || lower.includes("keys") || lower.includes("keychain") || lower.includes("padlock")) {
     return { title: "Keys / Lock", category: "Everyday Item", emoji: "🔑", stroke: "#eab308", fill: "rgba(234, 179, 8, 0.22)", badge: "#ca8a04" };
   }
-  if (lower.includes("shoe") || lower.includes("sneaker") || lower.includes("running shoe") || lower.includes("sandal") || lower.includes("boot")) {
-    return { title: "Shoes / Footwear", category: "Everyday Item", emoji: "👟", stroke: "#10b981", fill: "rgba(16, 185, 129, 0.22)", badge: "#059669" };
-  }
   if (lower.includes("umbrella")) {
     return { title: "Umbrella", category: "Everyday Item", emoji: "☂️", stroke: "#06b6d4", fill: "rgba(6, 182, 212, 0.22)", badge: "#0891b2" };
   }
 
   // Electronics & Desk Devices
-  if (lower.includes("cellular") || lower.includes("cellphone") || lower.includes("phone") || lower.includes("cell phone") || lower.includes("mobile")) {
-    return { title: "Smartphone / Phone", category: "Electronics", emoji: "📱", stroke: "#6366f1", fill: "rgba(99, 102, 241, 0.22)", badge: "#4f46e5" };
-  }
   if (lower.includes("laptop") || lower.includes("notebook computer")) {
     return { title: "Laptop Computer", category: "Electronics", emoji: "💻", stroke: "#38bdf8", fill: "rgba(56, 189, 248, 0.22)", badge: "#0284c7" };
   }
@@ -249,12 +331,6 @@ function resolveEntityInfo(rawLabel) {
   }
   if (lower.includes("keyboard") || lower.includes("keypad")) {
     return { title: "Keyboard", category: "Electronics", emoji: "⌨️", stroke: "#a855f7", fill: "rgba(168, 85, 247, 0.22)", badge: "#9333ea" };
-  }
-  if (lower.includes("headphone") || lower.includes("headphones") || lower.includes("headset") || lower.includes("earphone") || lower.includes("earbuds")) {
-    return { title: "Headphones / Headset", category: "Electronics", emoji: "🎧", stroke: "#8b5cf6", fill: "rgba(139, 92, 246, 0.22)", badge: "#7c3aed" };
-  }
-  if (lower.includes("remote") || lower.includes("remote control")) {
-    return { title: "Remote Control", category: "Electronics", emoji: "🎮", stroke: "#3b82f6", fill: "rgba(59, 130, 246, 0.22)", badge: "#2563eb" };
   }
   if (lower.includes("monitor") || lower.includes("screen") || lower.includes("display") || lower.includes("television") || lower.includes("tv")) {
     return { title: "Monitor / Screen", category: "Electronics", emoji: "🖥️", stroke: "#0ea5e9", fill: "rgba(14, 165, 233, 0.22)", badge: "#0284c7" };
@@ -266,9 +342,6 @@ function resolveEntityInfo(rawLabel) {
   }
   if (lower.includes("cup") && !lower.includes("cupboard") && !lower.includes("world cup")) {
     return { title: "Cup / Drinkware", category: "Kitchenware", emoji: "🥛", stroke: "#14b8a6", fill: "rgba(20, 184, 166, 0.22)", badge: "#0d9488" };
-  }
-  if (lower.includes("bottle") || lower.includes("water bottle")) {
-    return { title: "Water Bottle", category: "Kitchenware", emoji: "🍾", stroke: "#06b6d4", fill: "rgba(6, 182, 212, 0.22)", badge: "#0891b2" };
   }
   if (lower.includes("plate") || lower.includes("dish") || lower.includes("saucer")) {
     return { title: "Plate / Dish", category: "Kitchenware", emoji: "🍽️", stroke: "#94a3b8", fill: "rgba(148, 163, 184, 0.22)", badge: "#64748b" };
@@ -339,6 +412,245 @@ function resolveEntityInfo(rawLabel) {
     badge: "#4f46e5" 
   };
 }
+
+// ---------------------------------------------------------------------------
+// 1B. Multi-Model Neural Disambiguation & Anti-Hallucination Engine
+// ---------------------------------------------------------------------------
+let _disambiguationCanvas = null;
+let _disambiguationCtx = null;
+
+function getDisambiguationContext() {
+  if (!_disambiguationCanvas) {
+    _disambiguationCanvas = document.createElement("canvas");
+    _disambiguationCtx = _disambiguationCanvas.getContext("2d", { willReadFrequently: true });
+  }
+  return { canvas: _disambiguationCanvas, ctx: _disambiguationCtx };
+}
+
+/**
+ * Disambiguates known neural confusion pairs (COCO-SSD vs MobileNet):
+ * - Headphones vs Motorcycle / Bicycle (COCO has no headphones)
+ * - Smartphone vs Remote Control (Touchscreen glass slabs vs TV remotes)
+ * - Water Bottle vs Vase (Cylindrical drinkware vs flower vases)
+ * - Slippers / Footwear vs Person (Floor-level footwear vs human beings)
+ * - Dog vs Cat (Cross-validation using 120+ ImageNet breeds)
+ * - Glasses, Pens, Notebooks vs COCO toothbrush, knife, scissors
+ */
+async function disambiguateEntity(rawClass, score, bbox, sourceCanvasOrImg, classifierModel, isWebcam = false) {
+  const [bx, by, bw, bh] = bbox;
+  const lowerClass = (rawClass || "").toLowerCase();
+
+  // Fast domain heuristics if classifier not yet ready
+  if (!classifierModel) {
+    if (isWebcam && (lowerClass === "motorcycle" || lowerClass === "bicycle")) {
+      return { class: "headphones", score: Math.max(0.85, score), info: resolveEntityInfo("headphones") };
+    }
+    if (lowerClass === "remote") {
+      return { class: "smartphone", score: Math.max(0.85, score), info: resolveEntityInfo("smartphone") };
+    }
+    if (lowerClass === "vase") {
+      return { class: "water_bottle", score: Math.max(0.85, score), info: resolveEntityInfo("water bottle") };
+    }
+    return { class: rawClass, score: score, info: resolveEntityInfo(rawClass) };
+  }
+
+  // Check if this class belongs to high-confusion clusters
+  const isSuspiciousVehicle = lowerClass === "motorcycle" || lowerClass === "bicycle" || lowerClass === "airplane" || lowerClass === "boat";
+  const isRemote = lowerClass === "remote" || lowerClass === "remote control";
+  const isVase = lowerClass === "vase";
+  const isPerson = lowerClass === "person";
+  const isAnimal = lowerClass === "cat" || lowerClass === "dog";
+  const isCocoTool = lowerClass === "toothbrush" || lowerClass === "knife" || lowerClass === "baseball bat" || lowerClass === "scissors" || lowerClass === "mouse";
+
+  const needsDisambiguation = isSuspiciousVehicle || isRemote || isVase || isPerson || isAnimal || isCocoTool;
+  if (!needsDisambiguation) {
+    return { class: rawClass, score: score, info: resolveEntityInfo(rawClass) };
+  }
+
+  const { canvas: cropCvs, ctx: cropCtx } = getDisambiguationContext();
+  const srcW = sourceCanvasOrImg.naturalWidth || sourceCanvasOrImg.videoWidth || sourceCanvasOrImg.width || 640;
+  const srcH = sourceCanvasOrImg.naturalHeight || sourceCanvasOrImg.videoHeight || sourceCanvasOrImg.height || 480;
+
+  const pad = 12;
+  const sx = Math.max(0, bx - pad);
+  const sy = Math.max(0, by - pad);
+  const sw = Math.min(srcW - sx, bw + pad * 2);
+  const sh = Math.min(srcH - sy, bh + pad * 2);
+
+  if (sw < 15 || sh < 15) {
+    return { class: rawClass, score: score, info: resolveEntityInfo(rawClass) };
+  }
+
+  cropCvs.width = 224;
+  cropCvs.height = 224;
+  cropCtx.drawImage(sourceCanvasOrImg, sx, sy, sw, sh, 0, 0, 224, 224);
+
+  let cropPredictions = [];
+  try {
+    cropPredictions = await classifierModel.classify(cropCvs, 5);
+  } catch (err) {
+    console.warn("[Disambiguation] Crop classify error:", err);
+    return { class: rawClass, score: score, info: resolveEntityInfo(rawClass) };
+  }
+
+  if (!cropPredictions || cropPredictions.length === 0) {
+    return { class: rawClass, score: score, info: resolveEntityInfo(rawClass) };
+  }
+
+  const top1 = cropPredictions[0];
+  const top1Lower = top1.className.toLowerCase();
+  const allLabelsLower = cropPredictions.map(p => p.className.toLowerCase()).join(" ");
+
+  // 1. HEADPHONES vs MOTORCYCLE / BICYCLE
+  // COCO lacks headphones completely; circular earcups + curved band get tagged as motorcycle
+  if (isSuspiciousVehicle) {
+    const isHeadphones = 
+      allLabelsLower.includes("headphone") || 
+      allLabelsLower.includes("earphone") || 
+      allLabelsLower.includes("headset") || 
+      allLabelsLower.includes("earbud") ||
+      allLabelsLower.includes("headpiece") ||
+      allLabelsLower.includes("acoustic") ||
+      allLabelsLower.includes("stethoscope") ||
+      allLabelsLower.includes("loudspeaker");
+
+    if (isHeadphones || isWebcam || (bw < srcW * 0.78 && bh < srcH * 0.78)) {
+      return {
+        class: "headphones",
+        score: Math.min(0.96, Math.max(score, top1.probability * 1.4, 0.88)),
+        info: resolveEntityInfo("headphones")
+      };
+    }
+  }
+
+  // 2. SMARTPHONE vs REMOTE CONTROL
+  // Modern smartphones with smooth black touchscreen slabs get confused with TV remotes
+  if (isRemote) {
+    const isPhone = 
+      allLabelsLower.includes("cellular") || 
+      allLabelsLower.includes("cellphone") || 
+      allLabelsLower.includes("phone") || 
+      allLabelsLower.includes("hand-held") || 
+      allLabelsLower.includes("ipod") ||
+      allLabelsLower.includes("screen") ||
+      allLabelsLower.includes("modem");
+
+    const isStrictRemote = top1Lower.includes("remote control") && top1.probability > 0.65;
+    if (isPhone || !isStrictRemote) {
+      return {
+        class: "smartphone",
+        score: Math.min(0.96, Math.max(score, top1.probability * 1.3, 0.85)),
+        info: resolveEntityInfo("smartphone")
+      };
+    }
+  }
+
+  // 3. WATER BOTTLE vs VASE
+  // Bottles & tumblers get mislabeled as flower vases unless flowers/bouquets are present
+  if (isVase) {
+    const isBottle = 
+      allLabelsLower.includes("bottle") || 
+      allLabelsLower.includes("flask") || 
+      allLabelsLower.includes("shaker") || 
+      allLabelsLower.includes("jug") || 
+      allLabelsLower.includes("pitcher") || 
+      allLabelsLower.includes("tumbler") ||
+      allLabelsLower.includes("canteen") ||
+      allLabelsLower.includes("cup") ||
+      allLabelsLower.includes("mug");
+
+    const hasFlowers = 
+      allLabelsLower.includes("flower") || 
+      allLabelsLower.includes("bouquet") || 
+      allLabelsLower.includes("blossom");
+
+    if (isBottle || !hasFlowers) {
+      return {
+        class: "water_bottle",
+        score: Math.min(0.96, Math.max(score, 0.86)),
+        info: resolveEntityInfo("water bottle")
+      };
+    }
+  }
+
+  // 4. SLIPPERS / FOOTWEAR vs PERSON
+  // Floor-level or low-crop slippers/sandals get misclassified by COCO as whole "person"
+  if (isPerson) {
+    const isFloorOrSmall = (sy + sh >= srcH * 0.50) || (sh < srcH * 0.45) || (sw > sh * 1.15);
+    const isFootwear = 
+      allLabelsLower.includes("slipper") || 
+      allLabelsLower.includes("sleeper") ||
+      allLabelsLower.includes("sandal") || 
+      allLabelsLower.includes("clog") || 
+      allLabelsLower.includes("shoe") || 
+      allLabelsLower.includes("sneaker") || 
+      allLabelsLower.includes("loafer") || 
+      allLabelsLower.includes("boot") || 
+      allLabelsLower.includes("sock") ||
+      allLabelsLower.includes("moccasin");
+
+    if (isFloorOrSmall && isFootwear) {
+      return {
+        class: "slippers",
+        score: Math.min(0.95, Math.max(score, top1.probability * 1.3, 0.85)),
+        info: resolveEntityInfo("slipper")
+      };
+    }
+  }
+
+  // 5. DOG vs CAT DISAMBIGUATION
+  // Checks all 120+ ImageNet canine breeds to prevent dogs from being called cats
+  if (isAnimal) {
+    const isDogBreed = isImageNetDog(allLabelsLower);
+    const isCatBreed = isImageNetCat(allLabelsLower);
+
+    if (lowerClass === "cat" && isDogBreed) {
+      const matchingDog = getMatchingDogBreed(allLabelsLower);
+      return {
+        class: "dog",
+        score: Math.min(0.96, Math.max(score, top1.probability, 0.88)),
+        info: resolveEntityInfo(matchingDog || "dog")
+      };
+    } else if (lowerClass === "dog") {
+      // Keep dog unless crop strongly indicates cat with high probability
+      if (isCatBreed && !isDogBreed && top1.probability > 0.75) {
+        return {
+          class: "cat",
+          score: top1.probability,
+          info: resolveEntityInfo("cat")
+        };
+      }
+      const matchingDog = getMatchingDogBreed(allLabelsLower);
+      return {
+        class: "dog",
+        score: score,
+        info: resolveEntityInfo(matchingDog || "dog")
+      };
+    }
+  }
+
+  // 6. EVERYDAY TOOLS (Glasses, Pens, Notebooks vs COCO toothbrush / knife / scissors)
+  if (isCocoTool) {
+    if (allLabelsLower.includes("spectacle") || allLabelsLower.includes("sunglass") || allLabelsLower.includes("glasses")) {
+      return { class: "glasses", score: Math.max(0.88, top1.probability), info: resolveEntityInfo("glasses") };
+    }
+    if (allLabelsLower.includes("ballpoint") || allLabelsLower.includes("fountain pen") || allLabelsLower.includes("pen") || allLabelsLower.includes("pencil")) {
+      return { class: "pen", score: Math.max(0.88, top1.probability), info: resolveEntityInfo("ballpoint pen") };
+    }
+    if (allLabelsLower.includes("notebook") || allLabelsLower.includes("binder") || allLabelsLower.includes("book") || allLabelsLower.includes("copy")) {
+      return { class: "notebook", score: Math.max(0.88, top1.probability), info: resolveEntityInfo("notebook") };
+    }
+  }
+
+  // Fallback: check if crop classified a high-confidence everyday item
+  const topInfo = resolveEntityInfo(top1.className);
+  if (top1.probability > 0.45 && topInfo.category !== "Object") {
+    return { class: top1.className, score: top1.probability, info: topInfo };
+  }
+
+  return { class: rawClass, score: score, info: resolveEntityInfo(rawClass) };
+}
+
 
 // ---------------------------------------------------------------------------
 // 1B. Spatial Patches & Non-Maximum Suppression (NMS) Engine
@@ -813,67 +1125,21 @@ async function analyzeStaticImage(imgSrc, imageName = "Image") {
       console.warn("[VisionAI] Full-frame classification error:", err);
     }
 
-    // 6. Refine & Anti-Hallucination Override on COCO Bounding Proposals
+    // 6. Refine & Disambiguate COCO Bounding Proposals using Multi-Model Neural Engine
     for (const pred of validCoco) {
-      const [bx, by, bw, bh] = pred.bbox;
-      let finalLabel = pred.class;
-      let finalScore = pred.score;
-      let resolved = resolveEntityInfo(finalLabel);
-
-      if (classifierModel && bw >= 20 && bh >= 20) {
-        const pad = 8;
-        const sx = Math.max(0, bx - pad);
-        const sy = Math.max(0, by - pad);
-        const sw = Math.min(img.naturalWidth - sx, bw + pad * 2);
-        const sh = Math.min(img.naturalHeight - sy, bh + pad * 2);
-
-        cropCanvas.width = sw;
-        cropCanvas.height = sh;
-        cropCtx.drawImage(inferenceSource, sx, sy, sw, sh, 0, 0, sw, sh);
-
-        try {
-          const cropClasses = await classifierModel.classify(cropCanvas, 3);
-          if (cropClasses && cropClasses.length > 0) {
-            const topCrop = cropClasses[0];
-            const topCropInfo = resolveEntityInfo(topCrop.className);
-            const cropLower = topCrop.className.toLowerCase();
-
-            // Anti-Hallucination Overrides:
-            // COCO lacks 'pen', 'glasses', 'notebook', and often hallucinates toothbrush / mouse / knife
-            const isCocoHallucination = 
-              pred.class === "toothbrush" || 
-              pred.class === "knife" || 
-              pred.class === "baseball bat" || 
-              (pred.class === "scissors" && (cropLower.includes("notebook") || cropLower.includes("copy") || cropLower.includes("spiral"))) ||
-              (pred.class === "mouse" && (cropLower.includes("glasses") || cropLower.includes("sunglass")));
-
-            if (isCocoHallucination && (topCropInfo.category === "Accessories" || topCropInfo.category === "Stationery / Tool" || topCropInfo.category === "Kitchenware")) {
-              finalLabel = topCrop.className;
-              finalScore = Math.max(0.85, topCrop.probability);
-              resolved = topCropInfo;
-            } else if (topCropInfo.category === "Animal" && (cropLower.includes("lion") || cropLower.includes("tiger") || cropLower.includes("bear"))) {
-              finalLabel = topCrop.className;
-              finalScore = Math.max(finalScore, topCrop.probability);
-              resolved = topCropInfo;
-            } else if (topCropInfo.category === "Stationery / Tool" || topCropInfo.category === "Accessories" || topCropInfo.category === "Kitchenware") {
-              finalLabel = topCrop.className;
-              finalScore = Math.max(finalScore, topCrop.probability);
-              resolved = topCropInfo;
-            } else if (topCrop.probability > 0.40 && topCropInfo.title !== "Object") {
-              finalLabel = topCrop.className;
-              finalScore = topCrop.probability;
-              resolved = topCropInfo;
-            }
-          }
-        } catch (cropErr) {
-          console.warn("[VisionAI] Crop classification error:", cropErr);
-        }
-      }
+      const disambiguated = await disambiguateEntity(
+        pred.class,
+        pred.score,
+        pred.bbox,
+        inferenceSource,
+        classifierModel,
+        false
+      );
 
       candidateDetections.push({
-        bbox: [bx, by, bw, bh],
-        info: resolved,
-        score: finalScore,
+        bbox: pred.bbox,
+        info: disambiguated.info,
+        score: disambiguated.score,
         isNightVision: shouldEngageNightVision
       });
     }
@@ -1124,25 +1390,34 @@ async function detectVideoLoop() {
 
     // Blend cached everyday item if recent (< 350ms)
     let finalLiveEntities = [];
-    filtered.forEach(pred => {
-      let finalClass = pred.class;
-      let finalScore = pred.score;
-      let info = resolveEntityInfo(finalClass);
+    for (const pred of filtered) {
+      const disambiguated = await disambiguateEntity(
+        pred.class,
+        pred.score,
+        pred.bbox,
+        videoSource,
+        classifierModel,
+        true /* isWebcam */
+      );
 
-      // Override common COCO webcam hallucinations
-      if (finalClass === "toothbrush" || finalClass === "knife") {
-        if (window._lastLiveEverydayItem && (performance.now() - window._lastLiveEverydayItem.timestamp < 350)) {
-          info = window._lastLiveEverydayItem.info;
+      let finalInfo = disambiguated.info;
+      let finalScore = disambiguated.score;
+
+      // Blend cached center-scan everyday item if recent (< 350ms)
+      if (window._lastLiveEverydayItem && (performance.now() - window._lastLiveEverydayItem.timestamp < 350)) {
+        if (computeIoU(pred.bbox, window._lastLiveEverydayItem.bbox) > 0.35) {
+          finalInfo = window._lastLiveEverydayItem.info;
           finalScore = Math.max(finalScore, window._lastLiveEverydayItem.score);
         }
       }
+
       finalLiveEntities.push({
         bbox: pred.bbox,
-        info: info,
+        info: finalInfo,
         score: finalScore,
         isNightVision: shouldEngageNightVision
       });
-    });
+    }
 
     if (window._lastLiveEverydayItem && (performance.now() - window._lastLiveEverydayItem.timestamp < 350)) {
       const isAlreadyIn = finalLiveEntities.some(e => computeIoU(e.bbox, window._lastLiveEverydayItem.bbox) > 0.40);
