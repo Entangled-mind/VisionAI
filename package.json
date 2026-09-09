@@ -1,0 +1,16 @@
+﻿{
+  "name": "visionai-live",
+  "version": "1.0.0",
+  "private": true,
+  "description": "VisionAI - Intelligent Multi-Model Face & Object Recognition Web App",
+  "scripts": {
+    "start": "npx serve web"
+  },
+  "keywords": [
+    "computer-vision",
+    "yolo",
+    "face-recognition",
+    "tensorflowjs",
+    "ai"
+  ]
+}
