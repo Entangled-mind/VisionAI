@@ -14,7 +14,7 @@
 
 <p align="center">
   <a href="https://visionnn-ai.vercel.app"><strong>Explore Live Website »</strong></a> ·
-  <a href="https://distributions-zones-myself-findlaw.trycloudflare.com"><strong>Streamlit Dashboard »</strong></a> ·
+  <a href="https://agent-treatment-transportation-lottery.trycloudflare.com"><strong>Streamlit Dashboard »</strong></a> ·
   <a href="#-live-deployments--interactive-demos">Live Demos</a> ·
   <a href="#-key-features">Key Features</a> ·
   <a href="#-architecture--pipeline">System Architecture</a> ·
@@ -31,8 +31,8 @@
 | Platform / Service | Access URL | Description & Capabilities | Status |
 | :--- | :--- | :--- | :--- |
 | **🚀 Production Web App (Vercel)** | [**visionnn-ai.vercel.app**](https://visionnn-ai.vercel.app) | Zero-server client-side WebGL engine with dual-neural pipeline & Night Vision ISP | [![Online](https://img.shields.io/badge/Status-Live%20Online-emerald?style=flat-square)](https://visionnn-ai.vercel.app) |
-| **⚡ Cloudflare Live Web App Mirror** | [**Live Web Mirror**](https://probability-foundation-contributor-necessarily.trycloudflare.com) | Real-time tunnel mirror for high-bandwidth web inspector and webcam testing | [![Online](https://img.shields.io/badge/Status-Active%20Mirror-38bdf8?style=flat-square)](https://probability-foundation-contributor-necessarily.trycloudflare.com) |
-| **📊 Streamlit Python CV Dashboard** | [**Streamlit Live Dashboard**](https://distributions-zones-myself-findlaw.trycloudflare.com) | Live Python CV dashboard: YuNet face enrollment, YOLOv8 object detection & SQLite analytics | [![Online](https://img.shields.io/badge/Status-Live%20Tunnel-f43f5e?style=flat-square)](https://distributions-zones-myself-findlaw.trycloudflare.com) |
+| **⚡ Cloudflare Live Web App Mirror** | [**Live Web Mirror**](https://lesson-mapping-chapters-bidding.trycloudflare.com) | Real-time tunnel mirror for high-bandwidth web inspector and webcam testing | [![Online](https://img.shields.io/badge/Status-Active%20Mirror-38bdf8?style=flat-square)](https://lesson-mapping-chapters-bidding.trycloudflare.com) |
+| **📊 Streamlit Python CV Dashboard** | [**Streamlit Live Dashboard**](https://agent-treatment-transportation-lottery.trycloudflare.com) | Live Python CV dashboard: YuNet face enrollment, YOLOv8 object detection & SQLite analytics | [![Online](https://img.shields.io/badge/Status-Live%20Tunnel-f43f5e?style=flat-square)](https://agent-treatment-transportation-lottery.trycloudflare.com) |
 | **🐙 GitHub Source Code Repository** | [**Entangled-mind/VisionAI**](https://github.com/Entangled-mind/VisionAI) | Full source code, weights, PyTorch training pipelines & documentation | [![GitHub Repo](https://img.shields.io/badge/GitHub-VisionAI-181717?style=flat-square&logo=github)](https://github.com/Entangled-mind/VisionAI) |
 
 ---
