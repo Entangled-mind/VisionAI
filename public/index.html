@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -10,9 +10,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 
-  <!-- TensorFlow.js & COCO-SSD Model for 100% In-Browser Zero-Server Inference -->
+  <!-- TensorFlow.js, COCO-SSD Object Detector & MobileNet 1,000-Class Fine-Grained Classifier -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
 </head>
 <body>
 
@@ -50,8 +51,8 @@
       <div class="pill-badge">⚡ PRODUCTION COMPUTER VISION SYSTEM</div>
       <h1 class="hero-title">Real-Time Face Recognition & <span class="gradient-text">Animal/Object Detection</span></h1>
       <p class="hero-description">
-        A dual-pipeline deep learning engine combining deep metric learning face recognition (128-D embeddings) 
-        and real-time YOLO/COCO object detection across all 80 classes. Runs client-side in your browser via WebGL and natively on Python desktop.
+        Dual-pipeline deep learning engine combining COCO-SSD spatial localization with MobileNet 1,000-class fine-grained neural classification.
+        Accurately recognizes wild animals (lion, tiger, bear, cheetah), everyday tools & stationery (pens, notebooks/copies, glasses, phones, bags, chairs, tables), and human faces with zero server lag.
       </p>
       
       <div class="hero-actions">
@@ -159,6 +160,10 @@
     <!-- Quick Sample Selectors -->
     <div class="sample-chips-row">
       <span class="chips-label">Quick Test Benchmark Samples:</span>
+      <button class="chip-btn" data-sample="assets/lion_sample.jpg">🦁 Test Lion (lion_sample.jpg)</button>
+      <button class="chip-btn" data-sample="assets/pen_sample.jpg">🖊️ Test Pen (pen_sample.jpg)</button>
+      <button class="chip-btn" data-sample="assets/glasses_sample.jpg">👓 Test Glasses (glasses_sample.jpg)</button>
+      <button class="chip-btn" data-sample="assets/notebook_sample.jpg">📓 Test Notebook / Copy (notebook_sample.jpg)</button>
       <button class="chip-btn" data-sample="assets/cat_sample.jpg">🐱 Test Cat (cat_sample.jpg)</button>
       <button class="chip-btn" data-sample="assets/dog_sample.jpg">🐶 Test Dog (dog_sample.jpg)</button>
       <button class="chip-btn" data-sample="assets/face_sample.jpg">👤 Test Face (face_sample.jpg)</button>
@@ -206,7 +211,7 @@
             <span id="static-animals" class="tele-val">0</span>
           </div>
           <div class="tele-item">
-            <span class="tele-label">OBJECTS & PEOPLE</span>
+            <span class="tele-label">TOOLS, PEOPLE & OBJECTS</span>
             <span id="static-objects" class="tele-val">0</span>
           </div>
         </div>
