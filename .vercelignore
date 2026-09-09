@@ -1,0 +1,11 @@
+.venv
+app/
+streamlit_app/
+src/
+models/
+data/
+tests/
+requirements.txt
+config.py
+generate_masterclass_pdf.py
+*.py
