@@ -1,7 +1,5 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/Entangled-mind/VisionAI/master/assets/github_profile_banner.jpg" alt="VisionAI Hero Banner" width="100%" style="border-radius: 12px; margin-bottom: 1.2rem;" />
-
 # 👁️ VisionAI — Intelligent Face & Object Recognition Engine
 ### *Production-Grade Dual-Pipeline Computer Vision with Real-Time Night Vision Enhancement*
 
