@@ -3,499 +3,489 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VisionAI — Intelligent Multi-Model Face & Object Recognition</title>
-  <meta name="description" content="Production-grade Computer Vision and Deep Learning system for real-time face recognition and animal/object detection. Live on Vercel.">
+
+  <title>VisionAI — Real-Time Face & Object Detection in the Browser</title>
+  <meta name="description" content="Real-time computer vision running entirely in your browser. Detect faces, animals, and 1,000+ everyday object classes with zero server lag — powered by on-device deep learning.">
+  <meta name="author" content="VisionAI">
+  <meta name="theme-color" content="#07090e">
+
+  <link rel="canonical" href="https://visionnn-ai.vercel.app/">
+  <meta name="robots" content="index, follow">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://visionnn-ai.vercel.app/">
+  <meta property="og:title" content="VisionAI — Real-Time Face & Object Detection">
+  <meta property="og:description" content="Real-time computer vision running entirely in your browser. Faces, animals, and 1,000+ object classes. No server required.">
+  <meta property="og:image" content="https://visionnn-ai.vercel.app/assets/og-cover.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="VisionAI — Real-Time Face & Object Detection">
+  <meta name="twitter:description" content="Real-time computer vision running entirely in your browser. No server required.">
+  <meta name="twitter:image" content="https://visionnn-ai.vercel.app/assets/og-cover.jpg">
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%91%81%EF%B8%8F%3C/text%3E%3C/svg%3E">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="style.css">
 
-  <!-- TensorFlow.js, COCO-SSD Object Detector & MobileNet 1,000-Class Fine-Grained Classifier -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js" defer></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "VisionAI",
+    "applicationCategory": "Computer Vision",
+    "operatingSystem": "Web Browser",
+    "description": "Real-time face recognition and object detection running entirely in the browser.",
+    "url": "https://visionnn-ai.vercel.app/",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
 </head>
 <body>
 
-  <!-- Navigation Bar -->
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <!-- ===================== NAVBAR ===================== -->
   <header class="navbar">
     <div class="nav-container">
-      <div class="brand">
-        <span class="logo-icon">👁️</span>
+      <a href="/" class="brand" aria-label="VisionAI home">
+        <span class="logo-icon" aria-hidden="true">👁️</span>
         <div class="brand-text">
           <span class="brand-title">VisionAI</span>
-          <span class="brand-badge">PRO V1.0</span>
+          <span class="brand-badge">REAL-TIME CV</span>
         </div>
-      </div>
-      
-      <nav class="nav-links">
-        <a href="#live-feed">📷 Live Camera</a>
-        <a href="#image-inspector">🔍 Inspector</a>
-        <a href="#architecture">🧩 Architecture</a>
-        <a href="https://distributions-zones-myself-findlaw.trycloudflare.com" target="_blank" style="color: #f43f5e; font-weight: 700;">📊 Streamlit Dashboard</a>
-        <a href="https://github.com/Entangled-mind/VisionAI" target="_blank">🐙 GitHub</a>
-        <a href="VisionAI_Masterclass_Guide.pdf" download>📖 PDF Guide</a>
+      </a>
+
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="nav-links">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="#live-feed">Live Camera</a>
+        <a href="#analytics">Analytics</a>
+        <a href="#image-inspector">Image Inspector</a>
+        <a href="#features">Features</a>
+        <a href="https://github.com/Entangled-mind/VisionAI" target="_blank" rel="noopener">GitHub</a>
       </nav>
 
       <div class="nav-actions">
-        <div id="model-status" class="status-indicator loading">
-          <span class="status-dot"></span>
+        <div id="model-status" class="status-indicator loading" role="status" aria-live="polite">
+          <span class="status-dot" aria-hidden="true"></span>
           <span class="status-text">Loading AI Models...</span>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-content">
-      <div class="pill-badge">⚡ PRODUCTION COMPUTER VISION SYSTEM</div>
-      <h1 class="hero-title">Real-Time Face Recognition & <span class="gradient-text">Animal/Object Detection</span></h1>
-      <p class="hero-description">
-        Dual-pipeline deep learning engine combining COCO-SSD spatial localization with MobileNet 1,000-class fine-grained neural classification.
-        Accurately recognizes wild animals (lion, tiger, bear, cheetah), everyday tools & stationery (pens, notebooks/copies, glasses, phones, bags, chairs, tables), and human faces with zero server lag.
-      </p>
-      
-      <div class="hero-actions">
-        <a href="#live-feed" class="btn btn-primary">📷 Launch Live Camera</a>
-        <a href="#image-inspector" class="btn btn-secondary">🔍 Test Custom Images</a>
-        <a href="https://distributions-zones-myself-findlaw.trycloudflare.com" target="_blank" class="btn btn-outline" style="border-color: #f43f5e; color: #fda4af;">📊 Open Streamlit Dashboard »</a>
-        <a href="VisionAI_Masterclass_Guide.pdf" download class="btn btn-outline">📥 Download PDF (110 KB)</a>
+  <main id="main">
+
+    <!-- ===================== HERO ===================== -->
+    <section class="hero">
+      <div class="hero-content">
+        <div class="pill-badge">
+          <span class="pill-dot" aria-hidden="true"></span>
+          Runs entirely in your browser
+        </div>
+        <h1 class="hero-title">
+          See the world through
+          <span class="gradient-text">intelligent eyes</span>
+        </h1>
+        <p class="hero-description">
+          Real-time face recognition, animal detection, and fine-grained object classification —
+          powered by on-device deep learning. No uploads. No servers. No waiting.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#live-feed" class="btn btn-primary">📷 Start Live Camera</a>
+          <a href="#image-inspector" class="btn btn-secondary">🖼️ Try an Image</a>
+        </div>
+
+        <div class="kpi-strip">
+          <div class="kpi-card">
+            <span class="kpi-val">1,080</span>
+            <span class="kpi-lbl">Recognizable Classes</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-val">&lt; 100 ms</span>
+            <span class="kpi-lbl">Typical Inference Latency</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-val">100%</span>
+            <span class="kpi-lbl">On-Device Privacy</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-val">0</span>
+            <span class="kpi-lbl">Images Sent to Servers</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== LIVE CAMERA ===================== -->
+    <section id="live-feed" class="section">
+      <div class="section-header">
+        <span class="section-eyebrow">Live Demo</span>
+        <h2>Point your camera at anything</h2>
+        <p>Detects cats, dogs, people, everyday objects, and dozens of animal species — right inside your browser tab.</p>
       </div>
 
-      <div class="kpi-strip">
-        <div class="kpi-card">
-          <span class="kpi-val">80+</span>
-          <span class="kpi-lbl">COCO Classes (Cats, Dogs, Objects)</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-val">128-D</span>
-          <span class="kpi-lbl">SFace Hypersphere Embeddings</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-val">30+ FPS</span>
-          <span class="kpi-lbl">Hardware-Accelerated Edge Inference</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-val">0.021%</span>
-          <span class="kpi-lbl">Equal Error Rate (EER) Metric</span>
-        </div>
-      </div>
-    </div>
-  </section>
+      <div class="camera-grid">
+        <div class="viewport-card">
+          <div class="viewport-wrapper">
+            <video id="webcam" autoplay playsinline muted aria-label="Live camera feed"></video>
+            <canvas id="overlay-canvas" role="img" aria-label="Detection overlay"></canvas>
+            <div id="shutter-flash" class="camera-flash" aria-hidden="true"></div>
 
-  <!-- Section 1: Live Camera Feed -->
-  <section id="live-feed" class="section">
-    <div class="section-header">
-      <h2>📷 Live Vision Feed (In-Browser WebGL Engine)</h2>
-      <p>Stream your camera live to detect cats, dogs, domestic animals, humans, and objects in real-time right inside your browser.</p>
-    </div>
+            <div id="camera-placeholder" class="placeholder-overlay">
+              <div class="placeholder-content">
+                <span class="placeholder-icon" aria-hidden="true">📷</span>
+                <h3>Camera is off</h3>
+                <p>Grant camera access to begin real-time detection. Your video never leaves this device.</p>
+                <button id="btn-start-camera-hero" class="btn btn-primary" type="button">Start Live Camera</button>
+              </div>
+            </div>
+          </div>
 
-    <div class="camera-grid">
-      <!-- Video / Canvas Display -->
-      <div class="viewport-card">
-        <div class="viewport-wrapper">
-          <video id="webcam" autoplay playsinline muted></video>
-          <canvas id="overlay-canvas"></canvas>
-          <div id="shutter-flash" class="camera-flash"></div>
-          
-          <div id="camera-placeholder" class="placeholder-overlay">
-            <div class="placeholder-content">
-              <span class="placeholder-icon">📷</span>
-              <h3>Camera is Idle</h3>
-              <p>Click <strong>"Start Live Camera"</strong> below to begin real-time hardware-accelerated detection.</p>
-              <button id="btn-start-camera-hero" class="btn btn-primary">Start Live Camera</button>
+          <div class="viewport-toolbar">
+            <button id="btn-toggle-camera" class="btn btn-primary" type="button" aria-label="Start or stop live camera">▶ Start Camera</button>
+            <button id="btn-flip-camera" class="btn btn-secondary" type="button" title="Switch between front and back camera">🔄 Flip</button>
+            <button id="btn-night-vision-live" class="btn btn-outline" type="button" title="Toggle adaptive night vision">🌙 Night: AUTO</button>
+            <button id="btn-snapshot" class="btn btn-outline" type="button" disabled>📸 Snapshot</button>
+
+            <div class="slider-control">
+              <label for="live-conf-slider">Sensitivity: <span id="live-conf-val">45%</span></label>
+              <input type="range" id="live-conf-slider" min="15" max="90" value="45" step="5" aria-label="Detection sensitivity">
             </div>
           </div>
         </div>
 
-        <!-- Controls Toolbar -->
-        <div class="viewport-toolbar">
-          <button id="btn-toggle-camera" class="btn btn-primary">▶ Start Live Camera</button>
-          <button id="btn-flip-camera" class="btn btn-secondary" title="Switch between front and back camera">🔄 Switch Camera</button>
-          <button id="btn-night-vision-live" class="btn btn-outline" title="Toggle Adaptive Night Vision">🌙 Night Vision: AUTO</button>
-          <button id="btn-snapshot" class="btn btn-outline" disabled>📸 Take Snapshot</button>
-          
-          <div class="slider-control">
-            <label for="live-conf-slider">Detection Sensitivity: <span id="live-conf-val">50%</span></label>
-            <input type="range" id="live-conf-slider" min="15" max="90" value="45" step="5">
-          </div>
-        </div>
-      </div>
+        <div class="telemetry-card">
+          <h3>Live Telemetry</h3>
 
-      <!-- Telemetry & Live Log -->
-      <div class="telemetry-card">
-        <h3>Live Inference Telemetry</h3>
-        
-        <div class="telemetry-grid">
-          <div class="tele-item">
-            <span class="tele-label">FRAME RATE</span>
-            <span id="tele-fps" class="tele-val">0.0 FPS</span>
-          </div>
-          <div class="tele-item">
-            <span class="tele-label">LATENCY</span>
-            <span id="tele-lat" class="tele-val">-- ms</span>
-          </div>
-          <div class="tele-item">
-            <span class="tele-label">ENTITIES DETECTED</span>
-            <span id="tele-count" class="tele-val">0</span>
-          </div>
-          <div class="tele-item">
-            <span class="tele-label">AMBIENT LIGHT (LUX)</span>
-            <span id="tele-lum" class="tele-val">--%</span>
-          </div>
-          <div class="tele-item">
-            <span class="tele-label">HARDWARE BACKEND</span>
-            <span id="tele-backend" class="tele-val">WebGL</span>
-          </div>
-        </div>
-
-        <h4 style="margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 0.9rem; text-transform: uppercase; color: var(--text-muted);">Active Detections</h4>
-        <div id="live-detections-list" class="detections-list">
-          <div class="empty-state">No entities currently in view. Turn on the camera and point it at a cat, dog, person, or laptop!</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Section 2: Static Image Inspector -->
-  <section id="image-inspector" class="section alternate-bg">
-    <div class="section-header">
-      <h2>🔍 Static Image Inspector & Threshold Playground</h2>
-      <p>Upload your own photo of a cat, dog, animal, person, or object, or select a pre-loaded benchmark test image.</p>
-    </div>
-
-    <!-- Benchmark Category Filter Tabs -->
-    <div class="tabs-nav" id="benchmark-tabs">
-      <button class="tab-btn active" data-filter="all">⚡ All Tests (15)</button>
-      <button class="tab-btn" data-filter="night">🌙 Night Vision (3)</button>
-      <button class="tab-btn" data-filter="tool">🖊️ Everyday & Tools (9)</button>
-      <button class="tab-btn" data-filter="animal">🦁 Wild Animals (3)</button>
-      <button class="tab-btn" data-filter="face">👤 Face Biometrics (1)</button>
-    </div>
-
-    <!-- Quick Sample Selectors -->
-    <div class="sample-chips-row" id="sample-chips-container">
-      <button class="chip-btn chip-night" data-category="night" data-sample="assets/dark_desk_sample.jpg">🌙 Test Dark Desk (Low Light Multi-Object)</button>
-      <button class="chip-btn chip-night" data-category="night" data-sample="assets/dark_lion_sample.jpg">🌙 Test Dark Lion (Low Light)</button>
-      <button class="chip-btn chip-night" data-category="night" data-sample="assets/dark_pen_sample.jpg">🌙 Test Dark Pen (Low Light)</button>
-      <button class="chip-btn" data-category="tool" data-sample="assets/desk_scene_sample.jpg">🖥️ Test Desk Scene (Notebook, Pen, Glasses)</button>
-      <button class="chip-btn" data-category="tool" data-sample="assets/headphone_sample.jpg">🎧 Test Headphones (headphone_sample.jpg)</button>
-      <button class="chip-btn" data-category="tool" data-sample="assets/bottle_sample.jpg">🍾 Test Water Bottle (bottle_sample.jpg)</button>
-      <button class="chip-btn" data-category="tool" data-sample="assets/phone_sample.jpg">📱 Test Smartphone (phone_sample.jpg)</button>
-      <button class="chip-btn" data-category="tool" data-sample="assets/slippers_sample.jpg">🩴 Test Slippers (slippers_sample.jpg)</button>
-      <button class="chip-btn" data-category="tool" data-sample="assets/pen_sample.jpg">🖊️ Test Pen (pen_sample.jpg)</button>
-      <button class="chip-btn" data-category="tool" data-sample="assets/glasses_sample.jpg">👓 Test Glasses (glasses_sample.jpg)</button>
-      <button class="chip-btn" data-category="tool" data-sample="assets/notebook_sample.jpg">📓 Test Notebook / Copy (notebook_sample.jpg)</button>
-      <button class="chip-btn" data-category="animal" data-sample="assets/lion_sample.jpg">🦁 Test Lion (lion_sample.jpg)</button>
-      <button class="chip-btn" data-category="animal" data-sample="assets/cat_sample.jpg">🐱 Test Cat (cat_sample.jpg)</button>
-      <button class="chip-btn" data-category="animal" data-sample="assets/dog_sample.jpg">🐶 Test Dog (dog_sample.jpg)</button>
-      <button class="chip-btn" data-category="face" data-sample="assets/face_sample.jpg">👤 Test Face (face_sample.jpg)</button>
-    </div>
-
-    <div class="inspector-grid">
-      <!-- Upload Dropzone -->
-      <div class="upload-container">
-        <div id="dropzone" class="dropzone">
-          <input type="file" id="file-input" accept="image/*" class="file-input">
-          <div class="dropzone-content">
-            <span class="dropzone-icon">📁</span>
-            <h3>Drag & Drop Image Here</h3>
-            <p>Supports JPG, PNG, WEBP, BMP — Upload photos in daylight, shadows, or darkness</p>
-            <span class="btn btn-secondary btn-sm">Browse Local Files</span>
-          </div>
-        </div>
-
-        <div class="slider-control" style="margin-top: 1rem;">
-          <label for="static-conf-slider">Inspector Confidence Threshold: <span id="static-conf-val">30%</span></label>
-          <input type="range" id="static-conf-slider" min="10" max="90" value="30" step="5">
-        </div>
-
-        <!-- Night Vision Enhancement Panel -->
-        <div class="night-panel">
-          <div class="night-panel-header">
-            <div class="night-panel-title">
-              <span>🌙</span>
-              <span>Night Vision AI Booster</span>
+          <div class="telemetry-grid" aria-live="polite">
+            <div class="tele-item">
+              <span class="tele-label">FRAME RATE</span>
+              <span id="tele-fps" class="tele-val">0.0 FPS</span>
             </div>
-            <select id="static-night-mode" class="night-select">
-              <option value="auto" selected>Auto Low-Light</option>
-              <option value="on">Always ON</option>
-              <option value="off">OFF (Standard)</option>
-            </select>
-          </div>
-          <div class="slider-control" style="margin: 0;">
-            <label for="static-night-gain">Exposure & Contrast Gain: <span id="static-night-gain-val">3.0x</span></label>
-            <input type="range" id="static-night-gain" min="10" max="50" value="30" step="5">
-          </div>
-        </div>
-      </div>
-
-      <!-- Preview & Results Canvas -->
-      <div class="result-container">
-        <!-- Display View Mode Switcher -->
-        <div id="view-mode-bar" class="view-mode-bar" style="display: none;">
-          <span class="view-mode-label">👁️ View Mode:</span>
-          <button id="btn-view-augmented" class="view-pill active" title="Show Bounding Boxes and Labels">Augmented AI View</button>
-          <button id="btn-view-illuminated" class="view-pill" title="Show Night-Vision Restored Tensor">🌙 Night Sensor Matrix</button>
-          <button id="btn-view-raw" class="view-pill" title="Show Unprocessed Original Image">Raw Original</button>
-        </div>
-
-        <div class="canvas-wrapper">
-          <div id="scanline-laser" class="scanline-laser" style="display: none;"></div>
-          <canvas id="static-canvas"></canvas>
-          <div id="static-placeholder" class="placeholder-overlay">
-            <div class="placeholder-content">
-              <span class="placeholder-icon">🖼️</span>
-              <h3>No Image Analyzed Yet</h3>
-              <p>Upload an image or pick a test sample above to inspect bounding boxes and confidence scores.</p>
+            <div class="tele-item">
+              <span class="tele-label">LATENCY</span>
+              <span id="tele-lat" class="tele-val">-- ms</span>
+            </div>
+            <div class="tele-item">
+              <span class="tele-label">OBJECTS</span>
+              <span id="tele-count" class="tele-val">0</span>
+            </div>
+            <div class="tele-item">
+              <span class="tele-label">AMBIENT LIGHT</span>
+              <span id="tele-lum" class="tele-val">--%</span>
+            </div>
+            <div class="tele-item">
+              <span class="tele-label">BACKEND</span>
+              <span id="tele-backend" class="tele-val">WebGL</span>
             </div>
           </div>
-        </div>
 
-        <div id="static-telemetry" class="static-telemetry" style="display: none;">
-          <div class="tele-item">
-            <span class="tele-label">IMAGE RESOLUTION</span>
-            <span id="static-res" class="tele-val">--</span>
-          </div>
-          <div class="tele-item">
-            <span class="tele-label">AMBIENT LUX</span>
-            <span id="static-lum" class="tele-val">--%</span>
-          </div>
-          <div class="tele-item">
-            <span class="tele-label">NIGHT VISION</span>
-            <span id="static-nv-status" class="tele-val">Off</span>
-          </div>
-          <div class="tele-item">
-            <span class="tele-label">ANIMALS FOUND</span>
-            <span id="static-animals" class="tele-val">0</span>
-          </div>
-          <div class="tele-item">
-            <span class="tele-label">TOOLS & OBJECTS</span>
-            <span id="static-objects" class="tele-val">0</span>
+          <h4 class="tele-subhead">Currently Detected</h4>
+          <div id="live-detections-list" class="detections-list" aria-live="polite">
+            <div class="empty-state">Nothing detected yet. Start the camera and point it at a person, pet, or object.</div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Entity Breakdown Table -->
-    <div id="inspector-table-container" class="table-container" style="display: none; margin-top: 2rem;">
-      <div class="table-header-row">
-        <h3>Detected Entities Breakdown</h3>
-        <button id="btn-copy-detections" class="btn btn-secondary btn-sm">📋 Copy Results JSON</button>
-      </div>
-      <table id="inspector-table" class="data-table">
-        <thead>
-          <tr>
-            <th>Category</th>
-            <th>Detected Label</th>
-            <th>Confidence Score</th>
-            <th>Bounding Box (x, y, w, h)</th>
-          </tr>
-        </thead>
-        <tbody id="inspector-table-body">
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <!-- Section 3: Architecture & Pipeline -->
-  <section id="architecture" class="section">
-    <div class="section-header">
-      <h2>🧩 System Pipeline & Dual-Model Architecture</h2>
-      <p>How the VisionAI spatial fusion engine unifies face recognition with real-time multi-class object detection.</p>
-    </div>
-
-    <div class="architecture-flow">
-      <div class="arch-box input-box">
-        <div class="arch-tag">INPUT</div>
-        <h4>Video Stream / Static Image</h4>
-        <p>DirectShow 30 FPS Camera or RGB Matrix</p>
+    <!-- ===================== ANALYTICS DASHBOARD ===================== -->
+    <section id="analytics" class="section alternate-bg">
+      <div class="section-header">
+        <span class="section-eyebrow">Analytics</span>
+        <h2>See what the model sees</h2>
+        <p>Live charts update as the camera detects objects — confidence scores, category breakdown, latency trends, and a rolling detection log.</p>
       </div>
 
-      <div class="arch-arrow">➔</div>
+      <div class="analytics-grid">
 
-      <div class="arch-branch">
-        <div class="arch-box face-branch">
-          <div class="arch-tag">FACE PIPELINE</div>
-          <h4>OpenCV YuNet Deep Detector</h4>
-          <p>5-Point Facial Landmark Alignment</p>
-          <div class="arch-subarrow">⬇</div>
-          <h4>SFace 128-D Metric Learning</h4>
-          <p>Unit Hypersphere Projection (||e||₂ = 1.0)</p>
-          <div class="arch-subarrow">⬇</div>
-          <h4>Top-K Ensemble Cosine Match</h4>
-          <p>Evaluates Top-3 Enrolled Poses (Threshold: 0.363)</p>
-        </div>
-
-        <div class="arch-box object-branch">
-          <div class="arch-tag">OBJECT & ANIMAL PIPELINE</div>
-          <h4>YOLOv8n / COCO-SSD</h4>
-          <p>Anchor-Free Multi-Scale Detection</p>
-          <div class="arch-subarrow">⬇</div>
-          <h4>80 COCO Classes</h4>
-          <p>Cats, Dogs, Horses, Bears, Vehicles, Household</p>
-          <div class="arch-subarrow">⬇</div>
-          <h4>Non-Maximum Suppression (NMS)</h4>
-          <p>IoU Overlap Pruning (Threshold: 0.45)</p>
-        </div>
-      </div>
-
-      <div class="arch-arrow">➔</div>
-
-      <div class="arch-box fusion-box">
-        <div class="arch-tag">SPATIAL FUSION & STABILITY</div>
-        <h4>Spatial Fusion Engine</h4>
-        <p>Binds Inner Face Identities to Outer Person Boxes</p>
-        <div class="arch-subarrow">⬇</div>
-        <h4>Temporal EMA Smoothing</h4>
-        <p>e_smooth = 0.70·e_(t-1) + 0.30·e_t + 8-Frame Latch</p>
-      </div>
-
-      <div class="arch-arrow">➔</div>
-
-      <div class="arch-box output-box">
-        <div class="arch-tag">STORAGE & ANALYTICS</div>
-        <h4>SQLite Event Logger</h4>
-        <p>4.0s Cooldown Throttling Cache</p>
-        <div class="arch-subarrow">⬇</div>
-        <h4>Pandas & Matplotlib BI</h4>
-        <p>Executive KPIs & Statistical Charts</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Section 4: Masterclass Educational PDF -->
-  <section id="masterclass-pdf" class="section alternate-bg">
-    <div class="section-header">
-      <h2>📖 VisionAI Masterclass Educational Guide</h2>
-      <p>A comprehensive 8-chapter publication-grade architectural manual and technical interview handbook.</p>
-    </div>
-
-    <div class="pdf-showcase-card">
-      <div class="pdf-info">
-        <div class="pill-badge">PUBLICATION-GRADE MANUAL (110.2 KB)</div>
-        <h3>VisionAI Masterclass Guide & Technical Handbook</h3>
-        <p>Written to provide complete mathematical transparency and engineering depth, covering everything built in this project.</p>
-        
-        <ul class="pdf-features-list">
-          <li><strong>Chapter 1:</strong> System Overview, Mission, & High-Level Architecture Flowchart</li>
-          <li><strong>Chapter 2:</strong> Computer Vision Mathematical Primitives (Matrices, Color Spaces, Bilinear Interpolation)</li>
-          <li><strong>Chapter 3:</strong> Deep Face Detection (YuNet ONNX & 5-Point Landmark Regression)</li>
-          <li><strong>Chapter 4:</strong> Deep Metric Learning & 128-D Embeddings (SFace, Hypersphere Projection, Cosine Distance)</li>
-          <li><strong>Chapter 5:</strong> Real-Time Object & Animal Detection (YOLOv8, Anchor-Free Heads, NMS)</li>
-          <li><strong>Chapter 6:</strong> Multi-Model Spatial & Temporal Fusion Engine (EMA Smoothing & Hysteresis)</li>
-          <li><strong>Chapter 7:</strong> SQLite Cooldown Logging, Pandas Analytics, & Benchmark Metrics (FAR, FRR, EER, IoU)</li>
-          <li><strong>Chapter 8:</strong> Technical Interview Masterclass (10 Deep Engineering Questions & Answers)</li>
-        </ul>
-
-        <div style="margin-top: 1.5rem;">
-          <a href="VisionAI_Masterclass_Guide.pdf" download class="btn btn-primary btn-lg">
-            📥 Download Masterclass Guide (PDF)
-          </a>
-        </div>
-      </div>
-
-      <div class="pdf-preview-box">
-        <div class="pdf-cover-mockup">
-          <div class="pdf-mockup-header">
-            <span>VisionAI Masterclass</span>
-            <span class="pdf-page-count">110 KB • 8 Chapters</span>
-          </div>
-          <div class="pdf-mockup-body">
-            <div class="mockup-diagram">
-              <div class="mockup-rect">Input Matrix</div>
-              <div class="mockup-arrow">↓</div>
-              <div class="mockup-rect highlight">YuNet + SFace (128-D)</div>
-              <div class="mockup-arrow">↓</div>
-              <div class="mockup-rect highlight">YOLOv8 (80 COCO Classes)</div>
-              <div class="mockup-arrow">↓</div>
-              <div class="mockup-rect">Spatial Fusion & Smoothing</div>
+        <!-- Confidence Bar Chart -->
+        <article class="analytics-card">
+          <header class="analytics-card-header">
+            <div>
+              <h3>Confidence Scores</h3>
+              <p class="analytics-subtitle">Per-object certainty in the current frame</p>
             </div>
-            <div class="mockup-formula">
-              cos(θ) = (A · B) / (||A|| ||B||)
+            <span id="analytics-conf-count" class="analytics-badge">0 objects</span>
+          </header>
+          <div class="analytics-body">
+            <canvas id="chart-confidence" class="analytics-canvas" aria-label="Confidence scores bar chart"></canvas>
+            <div id="chart-confidence-empty" class="analytics-empty">
+              No detections yet — start the camera or run an image through the inspector.
             </div>
           </div>
-          <div class="pdf-mockup-footer">
-            <span>Verified Portfolio Project</span>
-            <span>DeepMind / Google AGY</span>
+        </article>
+
+        <!-- Category Donut Chart -->
+        <article class="analytics-card">
+          <header class="analytics-card-header">
+            <div>
+              <h3>Category Breakdown</h3>
+              <p class="analytics-subtitle">Distribution across entity types</p>
+            </div>
+            <span id="analytics-cat-total" class="analytics-badge">0</span>
+          </header>
+          <div class="analytics-body analytics-body--donut">
+            <canvas id="chart-categories" class="analytics-canvas analytics-canvas--donut" aria-label="Category breakdown donut chart"></canvas>
+            <ul id="chart-categories-legend" class="donut-legend" aria-label="Category legend">
+              <li class="donut-legend-empty">Waiting for data…</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Latency Line Chart -->
+        <article class="analytics-card analytics-card--wide">
+          <header class="analytics-card-header">
+            <div>
+              <h3>Inference Latency</h3>
+              <p class="analytics-subtitle">Milliseconds per frame — last 60 samples</p>
+            </div>
+            <span id="analytics-lat-avg" class="analytics-badge">— ms avg</span>
+          </header>
+          <div class="analytics-body">
+            <canvas id="chart-latency" class="analytics-canvas analytics-canvas--line" aria-label="Inference latency line chart"></canvas>
+            <div id="chart-latency-empty" class="analytics-empty">
+              Start the camera to begin measuring frame latency.
+            </div>
+          </div>
+        </article>
+
+        <!-- Detection Timeline -->
+        <article class="analytics-card analytics-card--wide">
+          <header class="analytics-card-header">
+            <div>
+              <h3>Detection Timeline</h3>
+              <p class="analytics-subtitle">Rolling log of the most recent detections</p>
+            </div>
+            <button id="btn-clear-timeline" class="btn btn-secondary btn-sm" type="button">Clear</button>
+          </header>
+          <div class="analytics-body">
+            <div id="detection-timeline" class="timeline" aria-live="polite">
+              <div class="timeline-empty">The timeline will fill in as objects are detected.</div>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ===================== STATIC INSPECTOR ===================== -->
+    <section id="image-inspector" class="section">
+      <div class="section-header">
+        <span class="section-eyebrow">Static Inspector</span>
+        <h2>Or analyze a photo</h2>
+        <p>Drop in your own image or pick one of the curated samples below to see how the model identifies different subjects.</p>
+      </div>
+
+      <div class="tabs-nav" id="benchmark-tabs" role="tablist" aria-label="Sample filters">
+        <button class="tab-btn active" data-filter="all" type="button" role="tab" aria-selected="true">All Samples</button>
+        <button class="tab-btn" data-filter="night" type="button" role="tab" aria-selected="false">🌙 Low Light</button>
+        <button class="tab-btn" data-filter="tool" type="button" role="tab" aria-selected="false">🖊️ Objects</button>
+        <button class="tab-btn" data-filter="animal" type="button" role="tab" aria-selected="false">🦁 Animals</button>
+        <button class="tab-btn" data-filter="face" type="button" role="tab" aria-selected="false">👤 People</button>
+      </div>
+
+      <div class="sample-chips-row" id="sample-chips-container">
+        <button class="chip-btn chip-night" data-category="night" data-sample="assets/dark_desk_sample.jpg" type="button">🌙 Dark Desk</button>
+        <button class="chip-btn chip-night" data-category="night" data-sample="assets/dark_lion_sample.jpg" type="button">🌙 Dark Lion</button>
+        <button class="chip-btn chip-night" data-category="night" data-sample="assets/dark_pen_sample.jpg" type="button">🌙 Dark Pen</button>
+        <button class="chip-btn" data-category="tool" data-sample="assets/desk_scene_sample.jpg" type="button">🖥️ Desk Scene</button>
+        <button class="chip-btn" data-category="tool" data-sample="assets/headphone_sample.jpg" type="button">🎧 Headphones</button>
+        <button class="chip-btn" data-category="tool" data-sample="assets/bottle_sample.jpg" type="button">🍾 Bottle</button>
+        <button class="chip-btn" data-category="tool" data-sample="assets/phone_sample.jpg" type="button">📱 Phone</button>
+        <button class="chip-btn" data-category="tool" data-sample="assets/slippers_sample.jpg" type="button">🩴 Slippers</button>
+        <button class="chip-btn" data-category="tool" data-sample="assets/pen_sample.jpg" type="button">🖊️ Pen</button>
+        <button class="chip-btn" data-category="tool" data-sample="assets/glasses_sample.jpg" type="button">👓 Glasses</button>
+        <button class="chip-btn" data-category="tool" data-sample="assets/notebook_sample.jpg" type="button">📓 Notebook</button>
+        <button class="chip-btn" data-category="animal" data-sample="assets/lion_sample.jpg" type="button">🦁 Lion</button>
+        <button class="chip-btn" data-category="animal" data-sample="assets/cat_sample.jpg" type="button">🐱 Cat</button>
+        <button class="chip-btn" data-category="animal" data-sample="assets/dog_sample.jpg" type="button">🐶 Dog</button>
+        <button class="chip-btn" data-category="face" data-sample="assets/face_sample.jpg" type="button">👤 Face</button>
+      </div>
+
+      <div class="inspector-grid">
+        <div class="upload-container">
+          <div id="dropzone" class="dropzone">
+            <input type="file" id="file-input" accept="image/*" class="file-input" aria-label="Upload image for inspection">
+            <div class="dropzone-content">
+              <span class="dropzone-icon" aria-hidden="true">📁</span>
+              <h3>Drop an image here</h3>
+              <p>JPG, PNG, WEBP, or BMP — up to any size</p>
+              <span class="btn btn-secondary btn-sm">Choose File</span>
+            </div>
+          </div>
+
+          <div class="slider-control slider-control--block">
+            <label for="static-conf-slider">Confidence Threshold: <span id="static-conf-val">30%</span></label>
+            <input type="range" id="static-conf-slider" min="10" max="90" value="30" step="5" aria-label="Confidence threshold">
+          </div>
+
+          <div class="night-panel">
+            <div class="night-panel-header">
+              <div class="night-panel-title">
+                <span aria-hidden="true">🌙</span>
+                <span>Night Vision</span>
+              </div>
+              <select id="static-night-mode" class="night-select" aria-label="Night vision mode">
+                <option value="auto" selected>Auto</option>
+                <option value="on">Always On</option>
+                <option value="off">Off</option>
+              </select>
+            </div>
+            <div class="slider-control slider-control--flat">
+              <label for="static-night-gain">Exposure Boost: <span id="static-night-gain-val">3.0x</span></label>
+              <input type="range" id="static-night-gain" min="10" max="50" value="30" step="5" aria-label="Exposure boost">
+            </div>
+          </div>
+        </div>
+
+        <div class="result-container">
+          <div id="view-mode-bar" class="view-mode-bar" style="display:none;">
+            <span class="view-mode-label">View:</span>
+            <button id="btn-view-augmented" class="view-pill active" type="button">Augmented</button>
+            <button id="btn-view-illuminated" class="view-pill" type="button">Night Sensor</button>
+            <button id="btn-view-raw" class="view-pill" type="button">Original</button>
+          </div>
+
+          <div class="canvas-wrapper">
+            <div id="scanline-laser" class="scanline-laser" style="display:none;" aria-hidden="true"></div>
+            <canvas id="static-canvas" role="img" aria-label="Static image detection canvas"></canvas>
+            <div id="static-placeholder" class="placeholder-overlay">
+              <div class="placeholder-content">
+                <span class="placeholder-icon" aria-hidden="true">🖼️</span>
+                <h3>No image yet</h3>
+                <p>Upload a file or click a sample above to see detections appear here.</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="static-telemetry" class="static-telemetry" style="display:none;" aria-live="polite">
+            <div class="tele-item">
+              <span class="tele-label">RESOLUTION</span>
+              <span id="static-res" class="tele-val">--</span>
+            </div>
+            <div class="tele-item">
+              <span class="tele-label">AMBIENT</span>
+              <span id="static-lum" class="tele-val">--%</span>
+            </div>
+            <div class="tele-item">
+              <span class="tele-label">NIGHT MODE</span>
+              <span id="static-nv-status" class="tele-val">Off</span>
+            </div>
+            <div class="tele-item">
+              <span class="tele-label">ANIMALS</span>
+              <span id="static-animals" class="tele-val">0</span>
+            </div>
+            <div class="tele-item">
+              <span class="tele-label">OBJECTS</span>
+              <span id="static-objects" class="tele-val">0</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- Section 5: Deploy Guide -->
-  <section id="deploy-guide" class="section">
-    <div class="section-header">
-      <h2>🚀 Live Shareable Deployment Instructions</h2>
-      <p>How this project is deployed to Vercel for instant sharing, and to Streamlit Community Cloud for native Python hosting.</p>
-    </div>
-
-    <div class="deploy-grid">
-      <!-- Vercel Card -->
-      <div class="deploy-card featured">
-        <div class="deploy-badge">SHARABLE WEB APP</div>
-        <h3>▲ Deploy to Vercel (This Website)</h3>
-        <p>Zero-config deployment hosting the responsive in-browser Computer Vision suite with WebGL hardware acceleration.</p>
-        
-        <ol class="deploy-steps">
-          <li>Install the Vercel CLI: <code>npm i -g vercel</code></li>
-          <li>Log in to your account: <code>vercel login</code></li>
-          <li>Inside this project directory, run: <code>vercel</code></li>
-          <li>Select <strong>Y</strong> to accept defaults. Vercel automatically deploys <code>web/</code> using <code>vercel.json</code>!</li>
-          <li>Your live shareable URL is generated: <code>https://visionai-&lt;your-username&gt;.vercel.app</code></li>
-        </ol>
-
-        <div class="terminal-box">
-          <code>&gt; vercel --prod</code>
+      <div id="inspector-table-container" class="table-container" style="display:none; margin-top:2rem;">
+        <div class="table-header-row">
+          <h3>Detected Entities</h3>
+          <button id="btn-copy-detections" class="btn btn-secondary btn-sm" type="button">📋 Copy JSON</button>
         </div>
+        <table id="inspector-table" class="data-table">
+          <thead>
+            <tr>
+              <th scope="col">Category</th>
+              <th scope="col">Detected Label</th>
+              <th scope="col">Confidence</th>
+              <th scope="col">Bounding Box (x, y, w, h)</th>
+            </tr>
+          </thead>
+          <tbody id="inspector-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===================== FEATURES ===================== -->
+    <section id="features" class="section alternate-bg">
+      <div class="section-header">
+        <span class="section-eyebrow">Why VisionAI</span>
+        <h2>Built for the real world</h2>
+        <p>A single page, a dozen capabilities. Everything happens locally on your device.</p>
       </div>
 
-      <!-- Streamlit Cloud Card -->
-      <div class="deploy-card">
-        <div class="deploy-badge">FULL PYTHON BACKEND</div>
-        <h3>☁️ Deploy to Streamlit Community Cloud</h3>
-        <p>Snowflake's free native cloud hosting running the full Python stack (PyTorch, YOLOv8n, YuNet, SFace, and SQLite).</p>
+      <div class="feature-grid">
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true">⚡</div>
+          <h3>Instant inference</h3>
+          <p>WebGL-accelerated detection runs frame-by-frame without ever touching a server.</p>
+        </article>
 
-        <ol class="deploy-steps">
-          <li>Push this repository to your GitHub account: <code>git push origin master</code></li>
-          <li>Visit <a href="https://share.streamlit.io" target="_blank" style="color: var(--primary);">share.streamlit.io</a> and sign in with GitHub.</li>
-          <li>Click <strong>"New App"</strong> and select your <code>VisionAI</code> repository.</li>
-          <li>Set main file path to: <code>app/app.py</code></li>
-          <li>Click <strong>"Deploy"</strong>! In ~2 minutes, your permanent Python app is live at <code>https://visionai.streamlit.app</code>.</li>
-        </ol>
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true">🔒</div>
+          <h3>Privacy by design</h3>
+          <p>Your camera feed and uploaded images never leave your browser. Nothing is uploaded, stored, or logged.</p>
+        </article>
 
-        <div class="terminal-box">
-          <code>Main file: streamlit_app/app.py</code>
-        </div>
-        <a href="https://distributions-zones-myself-findlaw.trycloudflare.com" target="_blank" class="btn btn-primary" style="margin-top: 1rem; width: 100%; text-align: center;">📊 Open Live Streamlit Cloud Dashboard »</a>
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true">🎯</div>
+          <h3>Fine-grained recognition</h3>
+          <p>Over 1,000 recognizable categories — from specific dog breeds to everyday desk objects.</p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true">🌙</div>
+          <h3>Works in low light</h3>
+          <p>Adaptive night-vision enhancement recovers detail from dark scenes automatically.</p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true">📱</div>
+          <h3>Works on your phone</h3>
+          <p>Fully responsive. Switch between front and rear cameras on any modern mobile browser.</p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true">📊</div>
+          <h3>Real-time analytics</h3>
+          <p>Live charts reveal confidence scores, category distribution, and latency trends as detection happens.</p>
+        </article>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Footer -->
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
   <footer class="footer">
     <div class="footer-container">
       <div class="footer-brand">
-        <span>👁️ VisionAI — Intelligent Face & Object Recognition System</span>
+        <span aria-hidden="true">👁️</span> VisionAI
       </div>
       <p class="footer-copy">
-        Production Computer Vision Engineering Portfolio. Built with OpenCV, PyTorch, YOLOv8, SFace, TensorFlow.js, Streamlit, and Vercel.
+        Real-time computer vision, running entirely in your browser.
       </p>
-      <div class="footer-links">
+      <nav class="footer-links" aria-label="Footer">
         <a href="#live-feed">Live Camera</a>
-        <a href="#image-inspector">Static Inspector</a>
-        <a href="https://distributions-zones-myself-findlaw.trycloudflare.com" target="_blank" style="color: #f43f5e; font-weight: 700;">Streamlit CV Dashboard</a>
-        <a href="https://github.com/Entangled-mind/VisionAI" target="_blank">GitHub Repository</a>
-        <a href="VisionAI_Masterclass_Guide.pdf" download>Download Masterclass PDF</a>
-      </div>
+        <a href="#analytics">Analytics</a>
+        <a href="#image-inspector">Image Inspector</a>
+        <a href="#features">Features</a>
+        <a href="https://github.com/Entangled-mind/VisionAI" target="_blank" rel="noopener">GitHub</a>
+      </nav>
     </div>
   </footer>
 
-  <!-- Toast Container -->
-  <div id="toast-container" class="toast-container"></div>
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
-  <script src="app.js"></script>
+  <script src="app.js" defer></script>
 </body>
 </html>
